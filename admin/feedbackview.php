@@ -76,8 +76,8 @@ if(!isset($_SESSION['auser']))
 									<h4 class="card-title">Feedback List</h4>
 									<small>Here, user can select feedbacks for displaying as testimonial. Note: Status "1" sets the feedback as testimonial.</small>
 									<?php 
-											if(isset($_GET['msg']))	
-											echo $_GET['msg'];
+											if (isset($_GET['msg_id'])) {
+												$msg_id = $_GET['msg_id'];}	
 											
 										?>
 								</div>
@@ -99,22 +99,24 @@ if(!isset($_SESSION['auser']))
                                             <tbody>
 											<?php
 													
-												$query=mysqli_query($con,"select feedback.*, user.* from feedback,user where feedback.uid=user.uid");
-												$cnt=1;
-												while($row=mysqli_fetch_array($query))
-													{
+													$sql = "SELECT feedback.*, user.* FROM feedback JOIN user ON feedback.uid = user.uid";
+													$stmt = $pdo->query($sql);
+													$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+													
+													$cnt = 1;
+													foreach ($rows as $row) {
 											?>
                                                 <tr>
                                                     <td><?php echo $cnt; ?></td>
                                                     <td><?php echo $row['uname']; ?></td>
                                                     <td><?php echo $row['uemail']; ?></td>
-                                                    <td><?php echo $row['2']; ?></td>
-                                                    <td><?php echo $row['3']; ?></td>
-													<td><a href="feedbackedit.php?id=<?php echo $row['0']; ?>"><button class="btn btn-info">Edit</button></a>
-                                                    <a href="feedbackdelete.php?id=<?php echo $row['0']; ?>"><button class="btn btn-danger">Delete</button></a></td>
+                                                    <td><?php echo $row['fdescription']; ?></td>
+                                                    <td><?php echo $row['status']; ?></td>
+													<td><a href="feedbackedit.php?id=<?php echo $row['fid']; ?>"><button class="btn btn-info">Edit</button></a>
+                                                    <a href="feedbackdelete.php?id=<?php echo $row['fid']; ?>"><button class="btn btn-danger">Delete</button></a></td>
                                                 </tr>
                                                 <?php
-												$cnt=$cnt+1;
+												$cnt++;
 												} 
 												?>
                                                

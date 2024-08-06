@@ -2,29 +2,31 @@
 include("config.php");
 $uid = $_GET['id'];
 
-// view code//
-$sql = "SELECT * FROM user where uid='$uid'";
-$result = mysqli_query($con, $sql);
-while($row = mysqli_fetch_array($result))
-	{
-	  $img=$row["uimage"];
-	}
-@unlink('user/'.$img);
+// view code
+$sql = "SELECT uimage FROM user WHERE uid = :uid";
+$stmt = $pdo->prepare($sql);
+$stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+$stmt->execute();
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-//end view code
-$msg="";
-$sql = "DELETE FROM user WHERE uid = {$uid}";
-$result = mysqli_query($con, $sql);
-if($result == true)
-{
-	$msg="<p class='alert alert-success'>Agent Deleted</p>";
-	header("Location:useragent.php?msg=$msg");
-}
-else
-{
-	$msg="<p class='alert alert-warning'>Agent not Deleted</p>";
-		header("Location:useragent.php?msg=$msg");
+if ($row) {
+    $img = $row['uimage'];
+    @unlink('user/' . $img);
 }
 
-mysqli_close($con);
+// end view code
+$msg = "";
+$sql = "DELETE FROM user WHERE uid = :uid";
+$stmt = $pdo->prepare($sql);
+$stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+
+if ($stmt->execute()) {
+    $msg = "<p class='alert alert-success'>Agent Deleted</p>";
+} else {
+    $msg = "<p class='alert alert-warning'>Agent not Deleted</p>";
+}
+
+header("Location: useragent.php?msg=" . urlencode($msg));
+
+$pdo = null;
 ?>

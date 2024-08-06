@@ -5,31 +5,34 @@ if(!isset($_SESSION['auser']))
 {
 	header("location:index.php");
 }
-if(isset($_POST['update']))
-{
-	$aid = $_GET['id'];
-	$title=$_POST['utitle'];
-	$content=$_POST['ucontent'];
-	
-	$aimage=$_FILES['aimage']['name'];
-	
-	$temp_name1 = $_FILES['aimage']['tmp_name'];
+if (isset($_POST['update'])) {
+    $aid = $_GET['id'];
+    $title = $_POST['utitle'];
+    $content = $_POST['ucontent'];
+    
+    $aimage = $_FILES['aimage']['name'];
+    $temp_name1 = $_FILES['aimage']['tmp_name'];
 
+    move_uploaded_file($temp_name1, "upload/$aimage");
+    
+    $sql = "UPDATE about SET title = :title, content = :content, image = :image WHERE id = :id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':title', $title);
+    $stmt->bindParam(':content', $content);
+    $stmt->bindParam(':image', $aimage);
+    $stmt->bindParam(':id', $aid, PDO::PARAM_INT);
 
-	move_uploaded_file($temp_name1,"upload/$aimage");
-	
-	$sql = "UPDATE about SET title = '{$title}' , content = '{$content}', image ='{$aimage}' WHERE id = {$aid}";
-	$result=mysqli_query($con,$sql);
-	if($result == true)
-	{
-		$msg="<p class='alert alert-success'>About Updated</p>";
-		header("Location:aboutview.php?msg=$msg");
-	}
-	else{
-		$msg="<p class='alert alert-warning'>About Not Updated</p>";
-		header("Location:aboutview.php?msg=$msg");
-	}
+    $result = $stmt->execute();
+
+    if ($result) {
+        $msg = "<p class='alert alert-success'>About Updated</p>";
+        header("Location:aboutview.php?msg=$msg");
+    } else {
+        $msg = "<p class='alert alert-warning'>About Not Updated</p>";
+        header("Location:aboutview.php?msg=$msg");
+    }
 }
+
 ?>
  
 <!DOCTYPE html>
@@ -98,11 +101,14 @@ if(isset($_POST['update']))
 									<h2 class="card-title">About Us</h2>
 								</div>
 								<?php 
-								$aid = $_GET['id'];
-								$sql = "SELECT * FROM about where id = {$aid}";
-								$result = mysqli_query($con, $sql);
-								while($row = mysqli_fetch_row($result))
-								{
+									$aid = $_GET['id'];
+									$sql = "SELECT * FROM about WHERE id = :id";
+									$stmt = $pdo->prepare($sql);
+									$stmt->bindParam(':id', $aid, PDO::PARAM_INT);
+									$stmt->execute();
+									$rows = $stmt->fetchAll(PDO::FETCH_NUM);
+
+									foreach ($rows as $row) {
 								?>
 								<form method="post" enctype="multipart/form-data">
 								<div class="card-body">

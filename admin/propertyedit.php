@@ -12,82 +12,107 @@ require("config.php");
 //// add code
 $error="";
 $msg="";
-if(isset($_POST['add']))
-{
-	$pid=$_REQUEST['id'];
-	
-	$title=$_POST['title'];
-	$content=$_POST['content'];
-	$ptype=$_POST['ptype'];
-	$bhk=$_POST['bhk'];
-	$bed=$_POST['bed'];
-	$balc=$_POST['balc'];
-	$hall=$_POST['hall'];
-	$stype=$_POST['stype'];
-	$bath=$_POST['bath'];
-	$kitc=$_POST['kitc'];
-	$floor=$_POST['floor'];
-	$price=$_POST['price'];
-	$city=$_POST['city'];
-	$asize=$_POST['asize'];
-	$loc=$_POST['loc'];
-	$state=$_POST['state'];
-	$status=$_POST['status'];
-	$uid=$_POST['uid'];
-	$feature=$_POST['feature'];
-	
-	$totalfloor=$_POST['totalfl'];
+if (isset($_POST['add'])) {
+    $pid = $_REQUEST['id'];
 
-	$isFeatured=$_POST['isFeatured'];
-	
-	$aimage=$_FILES['aimage']['name'];
-	$aimage1=$_FILES['aimage1']['name'];
-	$aimage2=$_FILES['aimage2']['name'];
-	$aimage3=$_FILES['aimage3']['name'];
-	$aimage4=$_FILES['aimage4']['name'];
-	
-	$fimage=$_FILES['fimage']['name'];
-	$fimage1=$_FILES['fimage1']['name'];
-	$fimage2=$_FILES['fimage2']['name'];
-	
-	$temp_name  =$_FILES['aimage']['tmp_name'];
-	$temp_name1 =$_FILES['aimage1']['tmp_name'];
-	$temp_name2 =$_FILES['aimage2']['tmp_name'];
-	$temp_name3 =$_FILES['aimage3']['tmp_name'];
-	$temp_name4 =$_FILES['aimage4']['tmp_name'];
-	
-	$temp_name5 =$_FILES['fimage']['tmp_name'];
-	$temp_name6 =$_FILES['fimage1']['tmp_name'];
-	$temp_name7 =$_FILES['fimage2']['tmp_name'];
-	
-	move_uploaded_file($temp_name,"property/$aimage");
-	move_uploaded_file($temp_name1,"property/$aimage1");
-	move_uploaded_file($temp_name2,"property/$aimage2");
-	move_uploaded_file($temp_name3,"property/$aimage3");
-	move_uploaded_file($temp_name4,"property/$aimage4");
-	
-	move_uploaded_file($temp_name5,"property/$fimage");
-	move_uploaded_file($temp_name6,"property/$fimage1");
-	move_uploaded_file($temp_name7,"property/$fimage2");
-	
-	
-	$sql = "UPDATE property SET title= '{$title}', pcontent= '{$content}', type='{$ptype}', bhk='{$bhk}', stype='{$stype}',
-	bedroom='{$bed}', bathroom='{$bath}', balcony='{$balc}', kitchen='{$kitc}', hall='{$hall}', floor='{$floor}', 
-	size='{$asize}', price='{$price}', location='{$loc}', city='{$city}', state='{$state}', feature='{$feature}',
-	pimage='{$aimage}', pimage1='{$aimage1}', pimage2='{$aimage2}', pimage3='{$aimage3}', pimage4='{$aimage4}',
-	uid='{$uid}', status='{$status}', mapimage='{$fimage}', topmapimage='{$fimage1}', groundmapimage='{$fimage2}', 
-	totalfloor='{$totalfloor}', isFeatured='{$isFeatured}' WHERE pid = {$pid}";
-	
-	$result=mysqli_query($con,$sql);
-	if($result == true)
-	{
-		$msg="<p class='alert alert-success'>Property Updated</p>";
-		header("Location:propertyview.php?msg=$msg");
-	}
-	else{
-		$msg="<p class='alert alert-warning'>Property Not Updated</p>";
-		header("Location:propertyview.php?msg=$msg");
-	}
+    $title = $_POST['title'];
+    $content = $_POST['content'];
+    $ptype = $_POST['ptype'];
+    $bhk = $_POST['bhk'];
+    $bed = $_POST['bed'];
+    $balc = $_POST['balc'];
+    $hall = $_POST['hall'];
+    $stype = $_POST['stype'];
+    $bath = $_POST['bath'];
+    $kitc = $_POST['kitc'];
+    $floor = $_POST['floor'];
+    $price = $_POST['price'];
+    $city = $_POST['city'];
+    $asize = $_POST['asize'];
+    $loc = $_POST['loc'];
+    $state = $_POST['state'];
+    $status = $_POST['status'];
+    $uid = $_POST['uid'];
+    $feature = $_POST['feature'];
+    $totalfloor = $_POST['totalfl'];
+    $isFeatured = $_POST['isFeatured'];
+
+    $aimage = $_FILES['aimage']['name'];
+    $aimage1 = $_FILES['aimage1']['name'];
+    $aimage2 = $_FILES['aimage2']['name'];
+    $aimage3 = $_FILES['aimage3']['name'];
+    $aimage4 = $_FILES['aimage4']['name'];
+
+    $fimage = $_FILES['fimage']['name'];
+    $fimage1 = $_FILES['fimage1']['name'];
+    $fimage2 = $_FILES['fimage2']['name'];
+
+    $temp_name = $_FILES['aimage']['tmp_name'];
+    $temp_name1 = $_FILES['aimage1']['tmp_name'];
+    $temp_name2 = $_FILES['aimage2']['tmp_name'];
+    $temp_name3 = $_FILES['aimage3']['tmp_name'];
+    $temp_name4 = $_FILES['aimage4']['tmp_name'];
+
+    $temp_name5 = $_FILES['fimage']['tmp_name'];
+    $temp_name6 = $_FILES['fimage1']['tmp_name'];
+    $temp_name7 = $_FILES['fimage2']['tmp_name'];
+
+    move_uploaded_file($temp_name, "property/$aimage");
+    move_uploaded_file($temp_name1, "property/$aimage1");
+    move_uploaded_file($temp_name2, "property/$aimage2");
+    move_uploaded_file($temp_name3, "property/$aimage3");
+    move_uploaded_file($temp_name4, "property/$aimage4");
+
+    move_uploaded_file($temp_name5, "property/$fimage");
+    move_uploaded_file($temp_name6, "property/$fimage1");
+    move_uploaded_file($temp_name7, "property/$fimage2");
+
+    $sql = "UPDATE property SET title= :title, pcontent= :content, type= :ptype, bhk= :bhk, stype= :stype,
+    bedroom= :bed, bathroom= :bath, balcony= :balc, kitchen= :kitc, hall= :hall, floor= :floor, 
+    size= :asize, price= :price, location= :loc, city= :city, state= :state, feature= :feature,
+    pimage= :aimage, pimage1= :aimage1, pimage2= :aimage2, pimage3= :aimage3, pimage4= :aimage4,
+    uid= :uid, status= :status, mapimage= :fimage, topmapimage= :fimage1, groundmapimage= :fimage2, 
+    totalfloor= :totalfloor, isFeatured= :isFeatured WHERE pid = :pid";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':title', $title);
+    $stmt->bindParam(':content', $content);
+    $stmt->bindParam(':ptype', $ptype);
+    $stmt->bindParam(':bhk', $bhk);
+    $stmt->bindParam(':stype', $stype);
+    $stmt->bindParam(':bed', $bed, PDO::PARAM_INT);
+    $stmt->bindParam(':bath', $bath, PDO::PARAM_INT);
+    $stmt->bindParam(':balc', $balc, PDO::PARAM_INT);
+    $stmt->bindParam(':kitc', $kitc, PDO::PARAM_INT);
+    $stmt->bindParam(':hall', $hall, PDO::PARAM_INT);
+    $stmt->bindParam(':floor', $floor);
+    $stmt->bindParam(':asize', $asize, PDO::PARAM_INT);
+    $stmt->bindParam(':price', $price, PDO::PARAM_INT);
+    $stmt->bindParam(':loc', $loc);
+    $stmt->bindParam(':city', $city);
+    $stmt->bindParam(':state', $state);
+    $stmt->bindParam(':feature', $feature);
+    $stmt->bindParam(':aimage', $aimage);
+    $stmt->bindParam(':aimage1', $aimage1);
+    $stmt->bindParam(':aimage2', $aimage2);
+    $stmt->bindParam(':aimage3', $aimage3);
+    $stmt->bindParam(':aimage4', $aimage4);
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+    $stmt->bindParam(':status', $status);
+    $stmt->bindParam(':fimage', $fimage);
+    $stmt->bindParam(':fimage1', $fimage1);
+    $stmt->bindParam(':fimage2', $fimage2);
+    $stmt->bindParam(':totalfloor', $totalfloor);
+    $stmt->bindParam(':isFeatured', $isFeatured, PDO::PARAM_INT);
+    $stmt->bindParam(':pid', $pid, PDO::PARAM_INT);
+
+    if ($stmt->execute()) {
+        $msg = "<p class='alert alert-success'>Property Updated</p>";
+        header("Location: propertyview.php?msg=$msg");
+    } else {
+        $msg = "<p class='alert alert-warning'>Property Not Updated</p>";
+        header("Location: propertyview.php?msg=$msg");
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -154,10 +179,13 @@ if(isset($_POST['add']))
 								
 								<?php
 									
-									$pid=$_REQUEST['id'];
-									$query=mysqli_query($con,"select * from property where pid='$pid'");
-									while($row=mysqli_fetch_row($query))
-									{
+									$pid = $_REQUEST['id'];
+									$query = $pdo->prepare("SELECT * FROM property WHERE pid = :pid");
+									$query->bindParam(':pid', $pid, PDO::PARAM_INT);
+									$query->execute();
+									$rows = $query->fetchAll(PDO::FETCH_NUM);
+
+									foreach ($rows as $row) {
 								?>
 												
 								<div class="card-body">
@@ -183,7 +211,7 @@ if(isset($_POST['add']))
 													<label class="col-lg-3 col-form-label">Property Type</label>
 													<div class="col-lg-9">
 														<select class="form-control" required name="ptype">
-															<option value="">Select Type</option>
+															<option value="<?php echo $row['3']; ?>"><?php echo $row['3']; ?></option>
 															<option value="apartment">Apartment</option>
 															<option value="flat">Flat</option>
 															<option value="building">Building</option>
@@ -197,7 +225,7 @@ if(isset($_POST['add']))
 													<label class="col-lg-3 col-form-label">Selling Type</label>
 													<div class="col-lg-9">
 														<select class="form-control" required name="stype">
-															<option value="">Select Status</option>
+															<option value="<?php echo $row['5']; ?>"><?php echo $row['5']; ?></option>
 															<option value="rent">Rent</option>
 															<option value="sale">Sale</option>
 														</select>
@@ -222,7 +250,7 @@ if(isset($_POST['add']))
 													<label class="col-lg-3 col-form-label">BHK</label>
 													<div class="col-lg-9">
 														<select class="form-control" required name="bhk">
-															<option value="">Select BHK</option>
+															<option value="<?php echo $row['4']; ?>"><?php echo $row['4']; ?></option>
 															<option value="1 BHK">1 BHK</option>
 															<option value="2 BHK">2 BHK</option>
 															<option value="3 BHK">3 BHK</option>

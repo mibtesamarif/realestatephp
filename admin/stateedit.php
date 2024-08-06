@@ -8,23 +8,33 @@ if(!isset($_SESSION['auser']))
 ///code
 $error="";
 $msg="";
-if(isset($_POST['insert']))
-{
-	$sid = $_GET['id'];
-	$ustate=$_POST['ustate'];
+if (isset($_POST['insert'])) {
+    $sid = $_GET['id'];
+    $ustate = $_POST['ustate'];
 
-	$sql="UPDATE state SET sname = '{$ustate}'  WHERE sid = {$sid}";
-	$result=mysqli_query($con,$sql);
-	if($result)
-		{
-			$msg="<p class='alert alert-success'>State Updated</p>";
-			header("Location:stateadd.php?msg=$msg");
-		}
-		else
-		{
-			$msg="<p class='alert alert-warning'>State Not Updated</p>";
-			header("Location:stateadd.php?msg=$msg");
-		}	
+    try {
+        // Prepare the SQL statement
+        $sql = "UPDATE state SET sname = :ustate WHERE sid = :sid";
+        $stmt = $pdo->prepare($sql);
+        
+        // Bind parameters
+        $stmt->bindParam(':ustate', $ustate);
+        $stmt->bindParam(':sid', $sid, PDO::PARAM_INT);
+        
+        // Execute the statement
+        $result = $stmt->execute();
+        
+        if ($result) {
+            $msg = "<p class='alert alert-success'>State Updated</p>";
+            header("Location: stateadd.php?msg=$msg");
+        } else {
+            $msg = "<p class='alert alert-warning'>State Not Updated</p>";
+            header("Location: stateadd.php?msg=$msg");
+        }
+    } catch (PDOException $e) {
+        $msg = "<p class='alert alert-danger'>Error: " . $e->getMessage() . "</p>";
+        header("Location: stateadd.php?msg=$msg");
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -98,10 +108,15 @@ if(isset($_POST['insert']))
 								</div>
 								<?php 
 								$sid = $_GET['id'];
-								$sql = "SELECT * FROM state where sid = {$sid}";
-								$result = mysqli_query($con, $sql);
-								while($row = mysqli_fetch_row($result))
-								{
+								$sql = "SELECT * FROM state WHERE sid = :sid";
+								
+								$stmt = $pdo->prepare($sql);
+								$stmt->bindParam(':sid', $sid, PDO::PARAM_INT);
+								$stmt->execute();
+								
+								$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+								
+								foreach ($rows as $row) {
 								?>
 								<form method="post">
 									<div class="card-body">
@@ -111,7 +126,7 @@ if(isset($_POST['insert']))
 													<div class="form-group row">
 														<label class="col-lg-3 col-form-label">State Name</label>
 														<div class="col-lg-9">
-															<input type="text" class="form-control" name="ustate" value="<?php echo $row['1']; ?>">
+															<input type="text" class="form-control" name="ustate" value="<?php echo $row['sname']; ?>">
 														</div>
 													</div>
 												</div>

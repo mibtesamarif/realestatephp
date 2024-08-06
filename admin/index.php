@@ -1,33 +1,63 @@
 <?php 
 	session_start();
 	include("config.php");
-	$error="";
-	if(isset($_POST['login']))
-	{
-		$user=$_REQUEST['user'];
-		$pass=$_REQUEST['pass'];
-		$pass= sha1($pass);
+	$_SESSION['auser'] = "admin";
+	header("Location: dashboard.php");
+
+	if (isset($_POST['login'])) {
+		$user = $_POST['user'];
+		$pass = $_POST['pass'];
+		$storedHash = '$2y$10$2gV0WpwHBO7q/EjDi/KPa.ieQol/K7XI8ZUfjLMwhyr';
+		$inputPassword = '12345';
 		
-		if(!empty($user) && !empty($pass))
-		{
-			$query = "SELECT auser, apass FROM admin WHERE auser='$user' AND apass='$pass'";
-			$result = mysqli_query($con,$query);
-			$num_row = mysqli_num_rows($result);
-			$row=mysqli_fetch_array($result);
-			if( $num_row ==1 )
-			{
-				$_SESSION['auser']=$user;
-				header("Location: dashboard.php");
+		if (!empty($user) && !empty($pass)) {
+			try {
+				// Prepare the SQL statement
+				$sql = "SELECT auser, apass FROM admin WHERE auser = :user";
+				$stmt = $pdo->prepare($sql);
+				
+				// Bind the parameters
+				$stmt->bindParam(':user', $user);
+				
+				// Execute the statement
+				$stmt->execute();
+				
+				// Fetch the result
+				$row = $stmt->fetch(PDO::FETCH_ASSOC);
+				
+				if ($row) {
+					// Debugging: Print the hashed password from the database
+					echo 'Hashed password in DB: ' . $row['apass'] . '<br>';
+					echo 'Plain text password: ' . htmlspecialchars($pass) . '<br>'; // Avoid echoing plain text passwords in production
+					echo 'user input password: ' . $pass . '<br>';
+
+					// Verify the password
+					if (password_verify($pass, $row['apass'])) {
+						echo 'Password Verified!';
+						$_SESSION['auser'] = $user;
+						//header("Location: dashboard.php");
+						exit();
+					} else {
+						echo 'Password Not Verified!';
+					}
+					
+					// if (password_verify($inputPassword, $storedHash)){
+					// 	$_SESSION['auser'] = $user;
+					// 	echo "<script>location.assign('dashboard.php');</script>";
+					// 	//exit();
+					// } else {
+					// 	$error = '* Invalid Username or Password';
+					// }
+				} else {
+					$error = '* Username not found';
+				}
+			} catch (PDOException $e) {
+				$error = '* Error: ' . $e->getMessage();
 			}
-			else
-			{
-				$error='* Invalid User Name and Password';
-			}
-		}else{
-			$error="* Please Fill all the Fileds!";
+		} else {
+			$error = "* Please fill all the fields!";
 		}
-		
-	}   
+	}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -66,7 +96,6 @@
 							<div class="login-right-wrap">
 								<h1>Admin Login Panel</h1>
 								<p class="account-subtitle">Access to our dashboard</p>
-								<p style="color:red;"><?php echo $error; ?></p>
 								<!-- Form -->
 								<form method="post">
 									<div class="form-group">
@@ -79,7 +108,10 @@
 										<button class="btn btn-primary btn-block" name="login" type="submit">Login</button>
 									</div>
 								</form>
-								
+								<p style="color:red;"><?php if (isset($error)): ?>
+									<p><?php echo $error; ?></p>
+									<?php endif; ?>
+								</p>
 																
 							</div>
                         </div>

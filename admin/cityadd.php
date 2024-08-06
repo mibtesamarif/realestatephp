@@ -8,28 +8,36 @@ include("config.php");
 ///code
 $error="";
 $msg="";
-if(isset($_POST['insert']))
-{
-	$state=$_POST['state'];
-	$city=$_POST['city'];
-	
-	if(!empty($state) && !empty($city)){
-		$sql="insert into city (cname,sid) values('$city','$state')";
-		$result=mysqli_query($con,$sql);
-		if($result)
-			{
-				$msg="<p class='alert alert-success'>City Inserted Successfully</p>";
-						
-			}
-			else
-			{
-				$error="<p class='alert alert-warning'>* City Not Inserted</p>";
-			}
-	}
-	else{
-		$error = "<p class='alert alert-warning'>* Fill all the Fields</p>";
-	}
-	
+if (isset($_POST['insert'])) {
+    $state = $_POST['state'];
+    $city = $_POST['city'];
+
+    if (!empty($state) && !empty($city)) {
+        // Check if the city already exists
+        $checkSql = "SELECT * FROM city WHERE cname = :city AND sid = :state";
+        $checkStmt = $pdo->prepare($checkSql);
+        $checkStmt->bindParam(':city', $city);
+        $checkStmt->bindParam(':state', $state);
+        $checkStmt->execute();
+
+        if ($checkStmt->rowCount() > 0) {
+            $error = "<p class='alert alert-warning'>* City Already Exists</p>";
+        } else {
+            // Insert the new city
+            $sql = "INSERT INTO city (cname, sid) VALUES (:city, :state)";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':city', $city);
+            $stmt->bindParam(':state', $state);
+            
+            if ($stmt->execute()) {
+                $msg = "<p class='alert alert-success'>City Inserted Successfully</p>";
+            } else {
+                $error = "<p class='alert alert-warning'>* City Not Inserted</p>";
+            }
+        }
+    } else {
+        $error = "<p class='alert alert-warning'>* Fill all the Fields</p>";
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -102,8 +110,8 @@ if(isset($_POST['insert']))
 									<?php echo $error;?>
 									<?php echo $msg;?>
 									<?php 
-										if(isset($_GET['msg']))	
-										echo $_GET['msg'];	
+										if (isset($_GET['msg_id'])) {
+											$msg_id = $_GET['msg_id'];}	
 									?>
 								</div>
 								<form method="post" id="insert product" enctype="multipart/form-data">
@@ -113,15 +121,16 @@ if(isset($_POST['insert']))
 													<h5 class="card-title">City Details</h5>
 													<div class="form-group row">
 														<label class="col-lg-3 col-form-label">State Name</label>
-														<div class="col-lg-9" >	
+														<div class="col-lg-9" >
+															<?php
+															// Example PDO query to get the state data
+															$query = $pdo->query("SELECT sid, sname FROM state");
+															$rows = $query->fetchAll(PDO::FETCH_ASSOC);
+															?>
 															<select class="form-control" name="state">
 																<option value="">Select</option>
-																<?php
-																		$query1=mysqli_query($con,"select * from state");
-																		while($row1=mysqli_fetch_row($query1))
-																			{
-																	?>
-																<option value="<?php echo $row1['0']; ?>" class="text-captalize"><?php echo $row1['1']; ?></option>
+																<?php foreach ($rows as $row1) { ?>
+																	<option value="<?php echo $row1['sid']; ?>" class="text-capitalize"><?php echo $row1['sname']; ?></option>
 																<?php } ?>
 															</select>
 														</div>
@@ -169,21 +178,21 @@ if(isset($_POST['insert']))
                                             <tbody>
 											<?php
 													
-												$query=mysqli_query($con,"select city.*,state.sname from city,state where city.sid=state.sid");
-												$cnt=1;
-												while($row=mysqli_fetch_array($query))
-													{
+													$query = $pdo->query("SELECT city.*, state.sname FROM city, state WHERE city.sid = state.sid");
+													$rows = $query->fetchAll(PDO::FETCH_ASSOC);
+													$cnt = 1;
+													foreach ($rows as $row) {
 											?>
                                                 <tr>
                                                     
                                                     <td><?php echo $cnt; ?></td>
-                                                    <td><?php echo $row['1']; ?></td>
-													<!-- <td><?php echo $row['2']; ?></td> -->
+                                                    <td><?php echo $row['cname']; ?></td>
+													<!-- <td><?php echo $row['sid']; ?></td> -->
 													<td><?php echo $row['sname']; ?></td>
-													<td><a href="cityedit.php?id=<?php echo $row['0']; ?>"><button class="btn btn-info">Edit</button></a>
-                                                   <a href="citydelete.php?id=<?php echo $row['0']; ?>"><button class="btn btn-danger">Delete</button></a></td>
+													<td><a href="cityedit.php?id=<?php echo $row['cid']; ?>"><button class="btn btn-info">Edit</button></a>
+                                                   <a href="citydelete.php?id=<?php echo $row['cid']; ?>"><button class="btn btn-danger">Delete</button></a></td>
                                                 </tr>
-                                                <?php $cnt=$cnt+1; } ?>
+                                                <?php $cnt++; } ?>
 
                                             </tbody>
                                         </table>

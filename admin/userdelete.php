@@ -2,29 +2,41 @@
 include("config.php");
 $uid = $_GET['id'];
 
-// view code//
-$sql = "SELECT * FROM user where uid='$uid'";
-$result = mysqli_query($con, $sql);
-while($row = mysqli_fetch_array($result))
-	{
-	  $img=$row["uimage"];
-	}
-@unlink('user/'.$img);
+// Prepare the SQL statement to select the user
+$sql = "SELECT * FROM user WHERE uid = :uid";
+$stmt = $pdo->prepare($sql);
+$stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
 
-//end view code
-$msg="";
-$sql = "DELETE FROM user WHERE uid = {$uid}";
-$result = mysqli_query($con, $sql);
-if($result == true)
-{
-	$msg="<p class='alert alert-success'>User Deleted</p>";
-	header("Location:userlist.php?msg=$msg");
-}
-else
-{
-	$msg="<p class='alert alert-warning'>User not Deleted</p>";
-		header("Location:userlist.php?msg=$msg");
+// Execute the statement
+$stmt->execute();
+
+// Fetch the result
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if ($row) {
+    $img = $row["uimage"];
+    
+    // Delete the image file
+    @unlink('user/' . $img);
+
+    // Prepare the SQL statement to delete the user
+    $sql = "DELETE FROM user WHERE uid = :uid";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+
+    // Execute the statement
+    if ($stmt->execute()) {
+        $msg = "<p class='alert alert-success'>User Deleted</p>";
+    } else {
+        $msg = "<p class='alert alert-warning'>User not Deleted</p>";
+    }
+} else {
+    $msg = "<p class='alert alert-warning'>User not found</p>";
 }
 
-mysqli_close($con);
+// Redirect with message
+header("Location: userlist.php?msg=" . urlencode($msg));
+
+// Close the PDO connection
+$pdo = null;
 ?>

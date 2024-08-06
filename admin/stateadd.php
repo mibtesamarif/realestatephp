@@ -8,27 +8,40 @@ require("config.php");
 ///code
 $error="";
 $msg="";
-if(isset($_POST['insert']))
-{
-	$state=$_POST['state'];
-	
-	if(!empty($state)){
-		$sql="insert into state (sname) values('$state')";
-		$result=mysqli_query($con,$sql);
-		if($result)
-			{
-				$msg="<p class='alert alert-success'>State Inserted Successfully</p>";
-						
-			}
-			else
-			{
-				$error="<p class='alert alert-warning'>* State Not Inserted</p>";
-			}
-	}
-	else{
-		$error = "<p class='alert alert-warning'>* Fill all the Fields</p>";
-	}
-	
+
+if (isset($_POST['insert'])) {
+    $ustate = $_POST['state'];
+
+    if (!empty($ustate)) {
+        try {
+            // Check if the state already exists
+            $checkSql = "SELECT COUNT(*) FROM state WHERE sname = :ustate";
+            $checkStmt = $pdo->prepare($checkSql);
+            $checkStmt->bindParam(':ustate', $ustate);
+            $checkStmt->execute();
+            $exists = $checkStmt->fetchColumn();
+
+            if ($exists) {
+                $msg = "<p class='alert alert-warning'>State Already Present</p>";
+            } else {
+                // State does not exist, insert it
+                $sql = "INSERT INTO state (sname) VALUES (:ustate)";
+                $stmt = $pdo->prepare($sql);
+                $stmt->bindParam(':ustate', $ustate);
+                $result = $stmt->execute();
+
+                if ($result) {
+                    $msg = "<p class='alert alert-success'>State Inserted Successfully</p>";
+                } else {
+                    $msg = "<p class='alert alert-warning'>State Not Inserted</p>";
+                }
+            }
+        } catch (PDOException $e) {
+            $error = "<p class='alert alert-danger'>Error: " . $e->getMessage() . "</p>";
+        }
+    } else {
+        $error = "<p class='alert alert-warning'>* Fill all the Fields</p>";
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -100,9 +113,9 @@ if(isset($_POST['insert']))
 									<h1 class="card-title">Add State</h1>
 									<?php echo $error;?>
 									<?php echo $msg;?>
-									<?php 
-										if(isset($_GET['msg']))	
-										echo $_GET['msg'];	
+									<?php
+										if (isset($_GET['msg_id'])) {
+											$msg_id = $_GET['msg_id'];}
 									?>
 								</div>
 								<form method="post" id="insert product" enctype="multipart/form-data">
@@ -148,25 +161,29 @@ if(isset($_POST['insert']))
                                             </thead>
                                         
                                         
-                                            <tbody>
-											<?php
-													
-												$query=mysqli_query($con,"select * from state");
-												$cnt=1;
-												while($row=mysqli_fetch_row($query))
-													{
-											?>
-                                                <tr>
-                                                    
-                                                    <td><?php echo $cnt; ?></td>
-                                                    <td><?php echo $row['1']; ?></td>
-													<td><a href="stateedit.php?id=<?php echo $row['0']; ?>"><button class="btn btn-info">Edit</button></a>
-                                                    <a href="statedelete.php?id=<?php echo $row['0']; ?>"><button class="btn btn-danger">Delete</button></a></td>
-                                                </tr>
-                                                <?php $cnt=$cnt+1; } ?>
-
-                                            </tbody>
-                                        </table>
+											<tbody>
+												<?php
+												// Prepare the SQL statement
+												$sql = "SELECT * FROM state";
+												$stmt = $pdo->query($sql);
+												$cnt = 1;
+												
+												// Fetch and display the results
+												while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+												?>
+												<tr>
+													<td><?php echo $cnt; ?></td>
+													<td><?php echo htmlspecialchars($row['sname']); ?></td>
+													<td>
+														<a href="stateedit.php?id=<?php echo $row['sid']; ?>"><button class="btn btn-info">Edit</button></a>
+														<a href="statedelete.php?id=<?php echo $row['sid']; ?>"><button class="btn btn-danger">Delete</button></a>
+													</td>
+												</tr>
+												<?php 
+													$cnt++;
+												} 
+												?>
+											</tbody>
 								</div>
 							</div>
 						</div>

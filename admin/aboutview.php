@@ -3,10 +3,10 @@ session_start();
 require("config.php");
 ////code
  
-// if(!isset($_SESSION['auser']))
-// {
-// 	header("location:index.php");
-// }
+if(!isset($_SESSION['auser']))
+{
+	header("location:index.php");
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -69,8 +69,8 @@ require("config.php");
 								<div class="card-header">
 									<h4 class="card-title">List Of About</h4>
 									<?php 
-											if(isset($_GET['msg']))	
-											echo $_GET['msg'];
+											if (isset($_GET['msg_id'])) {
+												$msg_id = $_GET['msg_id'];}	
 											
 									?>
 								</div>
@@ -90,10 +90,11 @@ require("config.php");
 											</thead>
 											<?php
 													
-													$query=mysqli_query($con,"select * from about");
-													$cnt=1;
-													while($row=mysqli_fetch_row($query))
-														{
+													$query = $pdo->query("SELECT * FROM about");
+													$rows = $query->fetchAll(PDO::FETCH_NUM);
+													$cnt = 1;
+
+													foreach ($rows as $row) {
 											?>
 											<tbody>
 												<tr>
@@ -106,7 +107,7 @@ require("config.php");
 												</tr>
 											</tbody>
 												<?php
-												$cnt=$cnt+1;
+												$cnt++;
 												} 
 												?>
 										</table>

@@ -75,8 +75,8 @@ if(!isset($_SESSION['auser']))
 								<div class="card-header">
 									<h4 class="card-title">Contact List</h4>
 									<?php 
-											if(isset($_GET['msg']))	
-											echo $_GET['msg'];
+											if (isset($_GET['msg_id'])) {
+												$msg_id = $_GET['msg_id'];}	
 											
 										?>
 								</div>
@@ -99,10 +99,11 @@ if(!isset($_SESSION['auser']))
                                             <tbody>
 											<?php
 													
-												$query=mysqli_query($con,"select * from contact");
-												$cnt=1;
-												while($row=mysqli_fetch_row($query))
-													{
+													$query = $pdo->query("SELECT * FROM contact");
+													$cnt = 1;
+													$rows = $query->fetchAll(PDO::FETCH_NUM);
+													
+													foreach ($rows as $row) {
 											?>
                                                 <tr>
                                                     <td><?php echo $cnt; ?></td>
@@ -114,7 +115,7 @@ if(!isset($_SESSION['auser']))
                                                     <td><a href="contactdelete.php?id=<?php echo $row['0']; ?>"><button class="btn btn-danger">Delete</button></a></td>
                                                 </tr>
                                                 <?php
-												$cnt=$cnt+1;
+												$cnt++;
 												} 
 												?>
                                                

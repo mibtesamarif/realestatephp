@@ -10,23 +10,22 @@ if(!isset($_SESSION['auser']))
 //// add code
 
 $msg="";
-if(isset($_POST['update']))
-{
-	$fid = $_GET['id'];
-	$status=$_POST['status'];
-		
-	$sql="UPDATE feedback SET status = '{$status}' WHERE fid = {$fid}";
-	$result=mysqli_query($con,$sql);
-	if($result == true)
-		{
-			$msg="<p class='alert alert-success'>Feedback Updated Successfully</p>";
-			header("Location:feedbackview.php?msg=$msg");		
-		}
-		else
-		{
-			$msg="<p class='alert alert-warning'>Feedback Not Updated</p>";
-			header("Location:feedbackview.php?msg=$msg");
-		}
+if (isset($_POST['update'])) {
+    $fid = $_GET['id'];
+    $status = $_POST['status'];
+
+    $sql = "UPDATE feedback SET status = :status WHERE fid = :fid";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':status', $status, PDO::PARAM_STR);
+    $stmt->bindParam(':fid', $fid, PDO::PARAM_INT);
+
+    if ($stmt->execute()) {
+        $msg = "<p class='alert alert-success'>Feedback Updated Successfully</p>";
+        header("Location:feedbackview.php?msg=$msg");
+    } else {
+        $msg = "<p class='alert alert-warning'>Feedback Not Updated</p>";
+        header("Location:feedbackview.php?msg=$msg");
+    }
 }
 ?>
  
@@ -96,10 +95,15 @@ if(isset($_POST['update']))
 								</div>
 								<?php 
 								$fid = $_GET['id'];
-								$sql = "SELECT * FROM feedback where fid = {$fid}";
-								$result = mysqli_query($con, $sql);
-								while($row = mysqli_fetch_row($result))
-								{
+
+								$sql = "SELECT * FROM feedback WHERE fid = :fid";
+								$stmt = $pdo->prepare($sql);
+								$stmt->bindParam(':fid', $fid, PDO::PARAM_INT);
+								$stmt->execute();
+								
+								$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+								
+								foreach ($rows as $row) {
 								?>
 								<form method="post">
 								<div class="card-body">
@@ -111,13 +115,13 @@ if(isset($_POST['update']))
 												<div class="form-group row">
 													<label class="col-lg-2 col-form-label">Feedback Id</label>
 													<div class="col-lg-9">
-														<input type="text" class="form-control" name="fid" value="<?php echo $row['0']; ?>" disabled>
+														<input type="text" class="form-control" name="fid" value="<?php echo $row['fid']; ?>" disabled>
 													</div>
 												</div>
 												<div class="form-group row">
 													<label class="col-lg-2 col-form-label">Status</label>
 													<div class="col-lg-9">
-														<input type="text" class="form-control" name="status" required="" value="<?php echo $row['3']; ?>">
+														<input type="text" class="form-control" name="status" required="" value="<?php echo $row['status']; ?>">
 														<small>Enter [1] to set as testimonial & [0] to cancel it.</small>
 													</div>
 												</div>

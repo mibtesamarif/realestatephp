@@ -3,10 +3,10 @@ session_start();
 require("config.php");
 ////code
  
-// if(!isset($_SESSION['auser']))
-// {
-// 	header("location:index.php");
-// }
+if(!isset($_SESSION['auser']))
+{
+	header("location:index.php");
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -79,8 +79,8 @@ require("config.php");
 
                                         <h4 class="header-title mt-0 mb-4">Property View</h4>
 										<?php 
-											if(isset($_GET['msg']))	
-											echo $_GET['msg'];	
+											if (isset($_GET['msg_id'])) {
+												$msg_id = $_GET['msg_id'];}		
 										?>
                                         <table id="datatable-buttons" class="table table-striped dt-responsive nowrap">
                                             <thead>
@@ -95,6 +95,7 @@ require("config.php");
                                                     <th>Price</th>
                                                     <th>Location</th>
 													<th>Status</th>
+													<th>User</th>
                                                    
                                                     
                                                     <th>Added Date</th>
@@ -106,35 +107,38 @@ require("config.php");
                                         
                                             <tbody>
 												<?php
-													
-													$query=mysqli_query($con,"select * from property");
-													while($row=mysqli_fetch_row($query))
-													{
+													$query = $pdo->query("SELECT * FROM property");
+													$rows = $query->fetchAll(PDO::FETCH_NUM);
+
+													foreach ($rows as $row) {
 												?>
-											
-                                                <tr>
-                                                    <!-- <td><?php echo $row['0']; ?></td> -->
-                                                    <td><?php echo $row['1']; ?></td>
-                                                    <td><?php echo $row['3']; ?></td>
-                                                    <td><?php echo $row['4']; ?></td>
-                                                    <td><?php echo $row['5']; ?></td>
-                                                   
-                                                    <td><?php echo $row['12']; ?></td>
-                                                    <td><?php echo $row['13']; ?></td>
-                                                    <td><?php echo $row['14']; ?></td>
-													
-                                                   
-                                                    <td><?php echo $row['24']; ?></td>
-													
-                                                    
-                                                    <td><?php echo $row['29']; ?></td>
-													<td><a href="propertyedit.php?id=<?php echo $row['0'];?>"><button class="btn btn-info">Edit</button></a>
-                                                    <a href="propertydelete.php?id=<?php echo $row['0'];?>"><button class="btn btn-danger">Delete</button></a></td>
-                                                </tr>
-                                               <?php
-												} 
+													<tr>
+														<!-- <td><?php echo $row[0]; ?></td> -->
+														<td><?php echo $row[1]; ?></td>
+														<td><?php echo $row[3]; ?></td>
+														<td><?php echo $row[4]; ?></td>
+														<td><?php echo $row[5]; ?></td>
+														<td><?php echo $row[12]; ?></td>
+														<td><?php echo $row[13]; ?></td>
+														<td><?php echo $row[14]; ?></td>
+														<td><?php echo $row[24]; ?></td>
+														<td><?php echo $row[23]; ?></td>
+														<td><?php echo $row[29]; ?></td>
+
+														<td>
+															<a href="propertyedit.php?id=<?php echo $row[0]; ?>">
+																<button class="btn btn-info">Edit</button>
+															</a>
+															<a href="propertydelete.php?id=<?php echo $row[0]; ?>">
+																<button class="btn btn-danger">Delete</button>
+															</a>
+														</td>
+													</tr>
+												<?php
+													}
 												?>
-                                            </tbody>
+											</tbody>
+
                                         </table>
                                         
                                     </div> <!-- end card body-->

@@ -3,30 +3,29 @@ include("config.php");
 $aid = $_GET['id'];
 
 // view code//
-$sql = "SELECT * FROM about where id='$aid'";
-$result = mysqli_query($con, $sql);
-while($row = mysqli_fetch_array($result))
-	{
-	  $img=$row["image"];
-	}
-@unlink('upload/'.$img);
+$aid = $_GET['id'];
 
-//end view code
+// Fetch the current image name
+$sql = "SELECT image FROM about WHERE id = :id";
+$stmt = $pdo->prepare($sql);
+$stmt->execute(['id' => $aid]);
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-
-$msg="";
-$sql = "DELETE FROM about WHERE id = {$aid}";
-$result = mysqli_query($con, $sql);
-if($result == true)
-{
-	$msg="<p class='alert alert-success'>About Deleted</p>";
-	header("Location:aboutview.php?msg=$msg");
-}
-else
-{
-	$msg="<p class='alert alert-warning'>About not Deleted</p>";
-		header("Location:aboutview.php?msg=$msg");
+if ($row) {
+    $img = $row["image"];
+    @unlink('upload/' . $img);
 }
 
-mysqli_close($con);
+// Delete the record
+$sql = "DELETE FROM about WHERE id = :id";
+$stmt = $pdo->prepare($sql);
+$result = $stmt->execute(['id' => $aid]);
+
+if ($result) {
+    $msg = "<p class='alert alert-success'>About Deleted</p>";
+    header("Location:aboutview.php?msg=$msg");
+} else {
+    $msg = "<p class='alert alert-warning'>About not Deleted</p>";
+    header("Location:aboutview.php?msg=$msg");
+}
 ?>

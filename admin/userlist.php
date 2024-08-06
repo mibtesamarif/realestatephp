@@ -74,9 +74,9 @@ require("config.php");
 							<div class="card">
 								<div class="card-header">
 									<h4 class="card-title">User List</h4>
-									<?php 
-										if(isset($_GET['msg']))	
-										echo $_GET['msg'];	
+									<?php
+										if (isset($_GET['msg_id'])) {
+											$msg_id = $_GET['msg_id'];}
 									?>
 								</div>
 								<div class="card-body">
@@ -96,28 +96,36 @@ require("config.php");
                                         
                                         
                                             <tbody>
-											<?php
-													
-												$query=mysqli_query($con,"select * from user where utype='user'");
-												$cnt=1;
-												while($row=mysqli_fetch_row($query))
-													{
-											?>
-                                                <tr>
-                                                    <td><?php echo $cnt; ?></td>
-                                                    <td><?php echo $row['1']; ?></td>
-                                                    <td><?php echo $row['2']; ?></td>
-                                                    <td><?php echo $row['3']; ?></td>
-                                                    <td><?php echo $row['5']; ?></td>
-													<td><img src="user/<?php echo $row['6']; ?>" height="50px" width="50px"></td>
-                                                    <td><a href="userdelete.php?id=<?php echo $row['0']; ?>"><button class="btn btn-danger">Delete</button></a></td>
-                                                </tr>
-                                                <?php
-												$cnt=$cnt+1;
-												} 
+												<?php
+												// Prepare the SQL statement
+												$sql = "SELECT * FROM user WHERE utype = 'user'";
+												$stmt = $pdo->prepare($sql);
+
+												// Execute the statement
+												$stmt->execute();
+
+												// Fetch all rows
+												$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+												$cnt = 1;
+
+												// Loop through each row
+												foreach ($rows as $row) {
 												?>
-                                               
-                                            </tbody>
+													<tr>
+														<td><?php echo $cnt; ?></td>
+														<td><?php echo htmlspecialchars($row['uname']); ?></td>
+														<td><?php echo htmlspecialchars($row['uemail']); ?></td>
+														<td><?php echo htmlspecialchars($row['uphone']); ?></td>
+														<td><?php echo htmlspecialchars($row['utype']); ?></td>
+														<td><img src="user/<?php echo htmlspecialchars($row['uimage']); ?>" height="50px" width="50px"></td>
+														<td><a href="userdelete.php?id=<?php echo $row['uid']; ?>"><button class="btn btn-danger">Delete</button></a></td>
+													</tr>
+												<?php
+													$cnt++;
+												}
+												?>
+											</tbody>
+
                                         </table>
 								</div>
 							</div>

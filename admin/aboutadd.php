@@ -10,29 +10,27 @@ require("config.php");
 //// add code
 $error="";
 $msg="";
-if(isset($_POST['addabout']))
-{
-	
-	$title=$_POST['title'];
-	$content=$_POST['content'];
-	$aimage=$_FILES['aimage']['name'];
-	
-	$temp_name1 = $_FILES['aimage']['tmp_name'];
+if (isset($_POST['addabout'])) {
+    $title = $_POST['title'];
+    $content = $_POST['content'];
+    $aimage = $_FILES['aimage']['name'];
+    $temp_name1 = $_FILES['aimage']['tmp_name'];
 
+    move_uploaded_file($temp_name1, "upload/$aimage");
 
-	move_uploaded_file($temp_name1,"upload/$aimage");
-	
-	$sql="insert into about (title,content,image) values('$title','$content','$aimage')";
-	$result=mysqli_query($con,$sql);
-	if($result)
-		{
-			$msg="<p class='alert alert-success'>Inserted Successfully</p>";
-					
-		}
-		else
-		{
-			$error="<p class='alert alert-warning'>* Not Inserted Some Error</p>";
-		}
+    $sql = "INSERT INTO about (title, content, image) VALUES (:title, :content, :image)";
+    $stmt = $pdo->prepare($sql);
+    $result = $stmt->execute([
+        'title' => $title,
+        'content' => $content,
+        'image' => $aimage
+    ]);
+
+    if ($result) {
+        $msg = "<p class='alert alert-success'>Inserted Successfully</p>";
+    } else {
+        $error = "<p class='alert alert-warning'>* Not Inserted Some Error</p>";
+    }
 }
 ?>
  

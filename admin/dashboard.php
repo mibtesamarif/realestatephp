@@ -7,6 +7,9 @@ require("config.php");
 // {
 // 	header("location:index.php");
 // }
+// if(!isset($_SESSION['auser'])){
+// 	echo "<script>location.assign('index.php')</script>";
+//   }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -79,8 +82,9 @@ require("config.php");
 									<div class="dash-widget-info">
 										
 										<h3><?php $sql = "SELECT * FROM user WHERE utype = 'user'";
-										$query = $con->query($sql);
-                						echo "$query->num_rows";?></h3>
+												$query = $pdo->query($sql);
+												echo $query->rowCount();
+												?></h3>
 										
 										<h6 class="text-muted">Registered Users</h6>
 										<div class="progress progress-sm">
@@ -102,8 +106,10 @@ require("config.php");
 									<div class="dash-widget-info">
 										
 									<h3><?php $sql = "SELECT * FROM user WHERE utype = 'agent'";
-										$query = $con->query($sql);
-                						echo "$query->num_rows";?></h3>
+											$query = $pdo->query($sql);
+											echo $query->rowCount();
+											?>
+											</h3>
 										
 										<h6 class="text-muted">Agents</h6>
 										<div class="progress progress-sm">
@@ -125,8 +131,9 @@ require("config.php");
 									<div class="dash-widget-info">
 										
 									<h3><?php $sql = "SELECT * FROM user WHERE utype = 'builder'";
-										$query = $con->query($sql);
-                						echo "$query->num_rows";?></h3>
+												$query = $pdo->query($sql);
+												echo $query->rowCount();
+												?></h3>
 										
 										<h6 class="text-muted">Builder</h6>
 										<div class="progress progress-sm">
@@ -148,8 +155,9 @@ require("config.php");
 									<div class="dash-widget-info">
 										
 									<h3><?php $sql = "SELECT * FROM property";
-										$query = $con->query($sql);
-                						echo "$query->num_rows";?></h3>
+												$query = $pdo->query($sql);
+												echo $query->rowCount();
+												?></h3>
 										
 										<h6 class="text-muted">Properties</h6>
 										<div class="progress progress-sm">
@@ -174,9 +182,10 @@ require("config.php");
 									</div>
 									<div class="dash-widget-info">
 										
-									<h3><?php $sql = "SELECT * FROM property where type = 'apartment'";
-										$query = $con->query($sql);
-                						echo "$query->num_rows";?></h3>
+									<h3><?php $sql = "SELECT * FROM property WHERE type = 'apartment'";
+											$query = $pdo->query($sql);
+											echo $query->rowCount();
+											?></h3>
 										
 										<h6 class="text-muted">No. of Apartments</h6>
 										<div class="progress progress-sm">
@@ -198,9 +207,10 @@ require("config.php");
 									</div>
 									<div class="dash-widget-info">
 										
-									<h3><?php $sql = "SELECT * FROM property where type = 'house'";
-										$query = $con->query($sql);
-                						echo "$query->num_rows";?></h3>
+									<h3><?php $sql = "SELECT * FROM property WHERE type = 'house'";
+												$query = $pdo->query($sql);
+												echo $query->rowCount();
+												?></h3>
 										
 										<h6 class="text-muted">No. of Houses</h6>
 										<div class="progress progress-sm">
@@ -222,9 +232,10 @@ require("config.php");
 									</div>
 									<div class="dash-widget-info">
 										
-									<h3><?php $sql = "SELECT * FROM property where type = 'building'";
-										$query = $con->query($sql);
-                						echo "$query->num_rows";?></h3>
+									<h3><?php $sql = "SELECT * FROM property WHERE type = 'building'";
+												$query = $pdo->query($sql);
+												echo $query->rowCount();
+												?></h3>
 										
 										<h6 class="text-muted">No. of Buildings</h6>
 										<div class="progress progress-sm">
@@ -246,9 +257,10 @@ require("config.php");
 									</div>
 									<div class="dash-widget-info">
 										
-									<h3><?php $sql = "SELECT * FROM property where type = 'flat'";
-										$query = $con->query($sql);
-                						echo "$query->num_rows";?></h3>
+									<h3><?php $sql = "SELECT * FROM property WHERE type = 'flat'";
+											$query = $pdo->query($sql);
+											echo $query->rowCount();
+											?></h3>
 										
 										<h6 class="text-muted">No. of Flat</h6>
 										<div class="progress progress-sm">
@@ -272,9 +284,10 @@ require("config.php");
 									</div>
 									<div class="dash-widget-info">
 										
-									<h3><?php $sql = "SELECT * FROM property where stype = 'sale'";
-										$query = $con->query($sql);
-                						echo "$query->num_rows";?></h3>
+									<h3><?php $sql = "SELECT * FROM property WHERE stype = 'sale'";
+												$query = $pdo->query($sql);
+												echo $query->rowCount();
+												?></h3>
 										
 										<h6 class="text-muted">On Sale</h6>
 										<div class="progress progress-sm">
@@ -296,9 +309,10 @@ require("config.php");
 									</div>
 									<div class="dash-widget-info">
 										
-									<h3><?php $sql = "SELECT * FROM property where stype = 'rent'";
-										$query = $con->query($sql);
-                						echo "$query->num_rows";?></h3>
+									<h3><?php $sql = "SELECT * FROM property WHERE stype = 'rent'";
+												$query = $pdo->query($sql);
+												echo $query->rowCount();
+												?></h3>
 										
 										<h6 class="text-muted">Rentals</h6>
 										<div class="progress progress-sm">
