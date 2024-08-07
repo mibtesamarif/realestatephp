@@ -3,30 +3,43 @@ session_start();
 include("config.php");
 $error="";
 $msg="";
-if(isset($_REQUEST['login']))
-{
-	$email=$_REQUEST['email'];
-	$pass=$_REQUEST['pass'];
-	$pass= sha1($pass);
-	
-	if(!empty($email) && !empty($pass))
-	{
-		$sql = "SELECT * FROM user where uemail='$email' && upass='$pass'";
-		$result=mysqli_query($con, $sql);
-		$row=mysqli_fetch_array($result);
-		   if($row){
-			   
-				$_SESSION['uid']=$row['uid'];
-				$_SESSION['uemail']=$email;
-				header("location:index.php");
-				
-		   }
-		   else{
-			   $error = "<p class='alert alert-warning'>Email or Password doesnot match!</p> ";
-		   }
-	}else{
-		$error = "<p class='alert alert-warning'>Please Fill all the fields</p>";
-	}
+if (isset($_REQUEST['login'])) {
+    $email = $_REQUEST['email'];
+    $pass = $_REQUEST['pass'];
+
+    if (!empty($email) && !empty($pass)) {
+        try {
+
+
+            // Prepare the SQL query to select user with the given email
+            $sql = "SELECT * FROM user WHERE uemail = :email";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $dpass= htmlspecialchars($pass);
+
+            if ($row) {
+                // Verify the hashed password
+                if ($dpass == $pass) {
+                    // Password is correct, set session variables
+                    $_SESSION['uid'] = $row['uid'];
+                    $_SESSION['utype'] = $row['utype'];
+                    $_SESSION['uemail'] = $email;
+                    header("location:index.php");
+                    exit(); // Ensure no further code is executed
+                } else {
+                    $error = "<p class='alert alert-warning'>Email or Password does not match!</p>";
+                }
+            } else {
+                $error = "<p class='alert alert-warning'>Email or Password does not match!</p>";
+            }
+        } catch (PDOException $e) {
+            $error = "<p class='alert alert-danger'>Error: " . $e->getMessage() . "</p>";
+        }
+    } else {
+        $error = "<p class='alert alert-warning'>Please Fill all the fields</p>";
+    }
 }
 ?>
 <!DOCTYPE html>

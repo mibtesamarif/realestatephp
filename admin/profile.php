@@ -6,9 +6,6 @@ require("config.php");
 // {
 // 	header("location:index.php");
 // }
-// if(!isset($_SESSION['auser'])){
-// 	echo "<script>location.assign('index.php')</script>";
-//   }
 
 if (isset($_REQUEST['insert'])) {
     $name = $_REQUEST['name'];

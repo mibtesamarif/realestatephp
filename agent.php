@@ -92,21 +92,32 @@ include("config.php");
                 <div class="row">
                 <!-- FOR MORE PROJECTS visit: freeprojectscodes.com -->
                     <?php 
-							$query=mysqli_query($con,"SELECT * FROM user WHERE utype='agent'");
-								while($row=mysqli_fetch_array($query))
-								{
+                        try {
+                        // Assuming PDO connection is established and stored in $pdo
+                            $sql = "SELECT * FROM user WHERE utype = 'agent'";
+                            $stmt = $pdo->prepare($sql);
+                            $stmt->execute();
+
+                            // Fetch all results into an array
+                            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                            // Use foreach loop to iterate over the results
+                            foreach ($results as $row) {
                             ?>
                             
                     <div class="col-md-6 col-lg-4">
                         <div class="hover-zoomer bg-white shadow-one mb-4">
-                            <div class="overflow-hidden"> <img src="admin/user/<?php echo $row['6'];?>" alt="aimage"> </div>
+                            <div class="overflow-hidden"> <img src="admin/user/<?php echo $row['uimage'];?>" alt="aimage"> </div>
                             <div class="py-3 text-center">
-                                <h5 class="text-secondary hover-text-success"><a href="#"><?php echo $row['1'];?></a></h5>
+                                <h5 class="text-secondary hover-text-success"><a href="#"><?php echo $row['uname'];?></a></h5>
                                 <span>Real Estate - Agent</span> </div>
                         </div>
                     </div>
                    
-                    <?php } ?>
+                    <?php }
+                        } catch (PDOException $e) {
+                            echo "Error: " . $e->getMessage();
+                        } ?>
                 
                   
                 </div>

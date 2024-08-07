@@ -91,23 +91,33 @@ include("config.php");
                         <div class="row">
 						
 							<?php 
-							$query=mysqli_query($con,"SELECT property.*, user.uname,user.utype,user.uimage FROM `property`,`user` WHERE property.uid=user.uid");
-								while($row=mysqli_fetch_array($query))
-								{
+                                try {
+                                    // Assuming PDO connection is established and stored in $pdo
+                                    $sql = "SELECT property.*, user.uname, user.utype, user.uimage 
+                                            FROM property 
+                                            JOIN user ON property.uid = user.uid";
+                                    $stmt = $pdo->prepare($sql);
+                                    $stmt->execute();
+
+                                    // Fetch all results into an array
+                                    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                                    // Use foreach loop to iterate over the results
+                                    foreach ($results as $row) {
 							?>
 									
                             <div class="col-md-6">
                                 <div class="featured-thumb hover-zoomer mb-4">
-                                    <div class="overlay-black overflow-hidden position-relative"> <img src="admin/property/<?php echo $row['18'];?>" alt="pimage">
+                                    <div class="overlay-black overflow-hidden position-relative"> <img src="admin/property/<?php echo $row['pimage'];?>" alt="pimage">
                                         
-                                        <div class="sale bg-success text-white">For <?php echo $row['5'];?></div>
-                                        <div class="price text-primary text-capitalize">$<?php echo $row['13'];?> <span class="text-white"><?php echo $row['12'];?> Sqft</span></div>
+                                        <div class="sale bg-success text-white">For <?php echo $row['stype'];?></div>
+                                        <div class="price text-primary text-capitalize">$<?php echo $row['price'];?> <span class="text-white"><?php echo $row['size'];?> Sqft</span></div>
                                         
                                     </div><!-- FOR MORE PROJECTS visit: freeprojectscodes.com -->
                                     <div class="featured-thumb-data shadow-one">
                                         <div class="p-4">
-                                            <h5 class="text-secondary hover-text-success mb-2 text-capitalize"><a href="propertydetail.php?pid=<?php echo $row['0'];?>"><?php echo $row['1'];?></a></h5>
-                                            <span class="location text-capitalize"><i class="fas fa-map-marker-alt text-success"></i> <?php echo $row['14'];?></span> </div>
+                                            <h5 class="text-secondary hover-text-success mb-2 text-capitalize"><a href="propertydetail.php?pid=<?php echo $row['pid'];?>"><?php echo $row['title'];?></a></h5>
+                                            <span class="location text-capitalize"><i class="fas fa-map-marker-alt text-success"></i> <?php echo $row['location'];?></span> </div>
                                         <div class="px-4 pb-4 d-inline-block w-100">
                                             <div class="float-left text-capitalize"><i class="fas fa-user text-success mr-1"></i>By : <?php echo $row['uname'];?></div>
                                             <div class="float-right"><i class="far fa-calendar-alt text-success mr-1"></i> <?php echo date('d-m-Y', strtotime($row['date']));?></div>
@@ -115,7 +125,10 @@ include("config.php");
                                     </div>
                                 </div>
                             </div>
-                            <?php } ?><!-- FOR MORE PROJECTS visit: freeprojectscodes.com -->
+                            <?php }
+                                } catch (PDOException $e) {
+                                    echo "Error: " . $e->getMessage();
+                                } ?><!-- FOR MORE PROJECTS visit: freeprojectscodes.com -->
                             
 
                             
@@ -169,16 +182,28 @@ include("config.php");
                         <ul class="property_list_widget">
 							
                             <?php 
-                            $query=mysqli_query($con,"SELECT * FROM `property` WHERE isFeatured = 1 ORDER BY date DESC LIMIT 3");
-                                    while($row=mysqli_fetch_array($query))
-                                    {
+                               try {
+                                // Assuming PDO connection is established and stored in $pdo
+                                $sql = "SELECT * FROM `property` WHERE isFeatured = 1 ORDER BY date DESC LIMIT 3";
+                                $stmt = $pdo->prepare($sql);
+                                $stmt->execute();
+                            
+                                // Fetch all results into an array
+                                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                            
+                                // Use foreach loop to iterate over the results
+                                foreach ($results as $row) {
+                                    
                             ?>
-                            <li> <img src="admin/property/<?php echo $row['18'];?>" alt="pimage">
-                                <h6 class="text-secondary hover-text-success text-capitalize"><a href="propertydetail.php?pid=<?php echo $row['0'];?>"><?php echo $row['1'];?></a></h6>
-                                <span class="font-14"><i class="fas fa-map-marker-alt icon-success icon-small"></i> <?php echo $row['14'];?></span>
+                            <li> <img src="admin/property/<?php echo $row['pimage'];?>" alt="pimage">
+                                <h6 class="text-secondary hover-text-success text-capitalize"><a href="propertydetail.php?pid=<?php echo $row['pid'];?>"><?php echo $row['title'];?></a></h6>
+                                <span class="font-14"><i class="fas fa-map-marker-alt icon-success icon-small"></i> <?php echo $row['location'];?></span>
                                 
                             </li>
-                            <?php } ?>
+                            <?php }
+                                } catch (PDOException $e) {
+                                    echo "Error: " . $e->getMessage();
+                                } ?>
 
                         </ul>
                         
@@ -187,16 +212,27 @@ include("config.php");
                             <ul class="property_list_widget"><!-- FOR MORE PROJECTS visit: freeprojectscodes.com -->
 							
 								<?php 
-								$query=mysqli_query($con,"SELECT * FROM `property` ORDER BY date DESC LIMIT 6");
-										while($row=mysqli_fetch_array($query))
-										{
+								try {
+                                    // Assuming PDO connection is established and stored in $pdo
+                                    $sql = "SELECT * FROM `property` ORDER BY date DESC LIMIT 6";
+                                    $stmt = $pdo->prepare($sql);
+                                    $stmt->execute();
+                                
+                                    // Fetch all results into an array
+                                    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                
+                                    // Use foreach loop to iterate over the results
+                                    foreach ($results as $row) {
 								?>
-                                <li> <img src="admin/property/<?php echo $row['18'];?>" alt="pimage">
-                                    <h6 class="text-secondary hover-text-success text-capitalize"><a href="propertydetail.php?pid=<?php echo $row['0'];?>"><?php echo $row['1'];?></a></h6>
-                                    <span class="font-14"><i class="fas fa-map-marker-alt icon-success icon-small"></i> <?php echo $row['14'];?></span>
+                                <li> <img src="admin/property/<?php echo $row['pimage'];?>" alt="pimage">
+                                    <h6 class="text-secondary hover-text-success text-capitalize"><a href="propertydetail.php?pid=<?php echo $row['pid'];?>"><?php echo $row['title'];?></a></h6>
+                                    <span class="font-14"><i class="fas fa-map-marker-alt icon-success icon-small"></i> <?php echo $row['location'];?></span>
                                     
                                 </li>
-                                <?php } ?>
+                                <?php }
+                                    } catch (PDOException $e) {
+                                        echo "Error: " . $e->getMessage();
+                                    } ?>
 
                             </ul>
                         </div>

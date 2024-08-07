@@ -132,6 +132,7 @@ if(!isset($_SESSION['auser']))
 															<a href="propertydelete.php?id=<?php echo $row[0]; ?>">
 																<button class="btn btn-danger">Delete</button>
 															</a>
+															
 														</td>
 													</tr>
 												<?php

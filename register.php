@@ -2,46 +2,55 @@
 include("config.php");
 $error="";
 $msg="";
-if(isset($_REQUEST['reg']))
-{
-	$name=$_REQUEST['name'];
-	$email=$_REQUEST['email'];
-	$phone=$_REQUEST['phone'];
-	$pass=$_REQUEST['pass'];
-	$utype=$_REQUEST['utype'];
-	
-	$uimage=$_FILES['uimage']['name'];
-	$temp_name1 = $_FILES['uimage']['tmp_name'];
-	$pass= sha1($pass);
-	
-	$query = "SELECT * FROM user where uemail='$email'";
-	$res=mysqli_query($con, $query);
-	$num=mysqli_num_rows($res);
-	
-	if($num == 1)
-	{
-		$error = "<p class='alert alert-warning'>Email Id already Exist</p> ";
-	}
-	else
-	{
-		
-		if(!empty($name) && !empty($email) && !empty($phone) && !empty($pass) && !empty($uimage))
-		{
-			
-			$sql="INSERT INTO user (uname,uemail,uphone,upass,utype,uimage) VALUES ('$name','$email','$phone','$pass','$utype','$uimage')";
-			$result=mysqli_query($con, $sql);
-			move_uploaded_file($temp_name1,"admin/user/$uimage");
-			   if($result){
-				   $msg = "<p class='alert alert-success'>Register Successfully</p> ";
-			   }
-			   else{
-				   $error = "<p class='alert alert-warning'>Register Not Successfully</p> ";
-			   }
-		}else{
-			$error = "<p class='alert alert-warning'>Please Fill all the fields</p>";
-		}
-	}
-	
+if(isset($_REQUEST['reg'])) {
+    $name = $_REQUEST['name'];
+    $email = $_REQUEST['email'];
+    $phone = $_REQUEST['phone'];
+    $pass = $_REQUEST['pass'];
+    $utype = $_REQUEST['utype'];
+    $uimage = $_FILES['uimage']['name'];
+    $temp_name1 = $_FILES['uimage']['tmp_name'];
+
+    // Hash the password using password_hash()
+    $hashed_pass = password_hash($pass, PASSWORD_DEFAULT);
+
+    try {
+
+        // Check if email already exists
+        $query = "SELECT * FROM user WHERE uemail = :email";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute(['email' => $email]);
+        $num = $stmt->rowCount();
+
+        if($num == 1) {
+            $error = "<p class='alert alert-warning'>Email Id already exists</p>";
+        } else {
+            if(!empty($name) && !empty($email) && !empty($phone) && !empty($pass) && !empty($uimage)) {
+                $sql = "INSERT INTO user (uname, uemail, uphone, upass, utype, uimage) VALUES (:name, :email, :phone, :pass, :utype, :uimage)";
+                $stmt = $pdo->prepare($sql);
+                $result = $stmt->execute([
+                    'name' => $name,
+                    'email' => $email,
+                    'phone' => $phone,
+                    'pass' => $hashed_pass,
+                    'utype' => $utype,
+                    'uimage' => $uimage
+                ]);
+
+                if($result) {
+                    move_uploaded_file($temp_name1, "admin/user/$uimage");
+                    $msg = "<p class='alert alert-success'>Registered Successfully</p>";
+                } else {
+                    $error = "<p class='alert alert-warning'>Registration Not Successful</p>";
+                    echo "<script> location.assign('login.php');</script>";
+                }
+            } else {
+                $error = "<p class='alert alert-warning'>Please Fill all the fields</p>";
+            }
+        }
+    } catch (PDOException $e) {
+        $error = "<p class='alert alert-danger'>Error: " . $e->getMessage() . "</p>";
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -74,6 +83,16 @@ if(isset($_REQUEST['reg']))
 <link rel="stylesheet" type="text/css" href="fonts/flaticon/flaticon.css">
 <link rel="stylesheet" type="text/css" href="css/style.css">
 <link rel="stylesheet" type="text/css" href="css/login.css">
+
+<style>
+        .password-validity {
+            font-size: 0.9rem;
+            color: #dc3545;
+        }
+        .valid {
+            color: #28a745;
+        }
+    </style>
 
 <!--	Title
 	=========================================================-->
@@ -133,16 +152,25 @@ if(isset($_REQUEST['reg']))
 								<!-- Form -->
 								<form method="post" enctype="multipart/form-data">
 									<div class="form-group">
-										<input type="text"  name="name" class="form-control" placeholder="Your Name*">
+										<input type="text"  name="name" class="form-control" placeholder="Your Name*" required>
 									</div>
 									<div class="form-group">
-										<input type="email"  name="email" class="form-control" placeholder="Your Email*">
+										<input type="email"  name="email" class="form-control" placeholder="Your Email*" required>
 									</div>
 									<div class="form-group">
-										<input type="text"  name="phone" class="form-control" placeholder="Your Phone*" maxlength="10">
+										<input type="text"  name="phone" class="form-control" placeholder="Your Phone*" minlength="11" maxlength="11" required>
 									</div>
 									<div class="form-group">
-										<input type="password" name="pass"  class="form-control" placeholder="Your Password*">
+										<input type="password" name="pass" id="password"  class="form-control" placeholder="Your Password*" required>
+                                        <small id="passwordHelp" class="form-text text-muted password-validity">
+                                            <ul>
+                                                <li id="length" class="invalid">Length: 8-16 characters</li>
+                                                <li id="number" class="invalid">At least one number</li>
+                                                <li id="special" class="invalid">At least one special character</li>
+                                                <li id="lower" class="invalid">At least one lowercase letter</li>
+                                                <li id="upper" class="invalid">At least one uppercase letter</li>
+                                            </ul>
+                                        </small>
 									</div>
 
 									 <div class="form-check-inline">
@@ -155,11 +183,6 @@ if(isset($_REQUEST['reg']))
 										<input type="radio" class="form-check-input" name="utype" value="agent">Agent
 									  </label>
 									</div>
-									<div class="form-check-inline disabled">
-									  <label class="form-check-label">
-										<input type="radio" class="form-check-input" name="utype" value="builder">Builder
-									  </label>
-									</div> 
 									
 									<div class="form-group">
 										<label class="col-form-label"><b>User Image</b></label>
@@ -224,5 +247,67 @@ if(isset($_REQUEST['reg']))
 <script src="js/jquery.slider.js"></script> 
 <script src="js/wow.js"></script> 
 <script src="js/custom.js"></script>
+
+<script>
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const length = document.getElementById('length');
+            const number = document.getElementById('number');
+            const special = document.getElementById('special');
+            const lower = document.getElementById('lower');
+            const upper = document.getElementById('upper');
+
+            const lengthPattern = /^.{8,16}$/;
+            const numberPattern = /\d/;
+            const specialPattern = /[!@#$%^&*(),.?":{}|<>]/;
+            const lowerPattern = /[a-z]/;
+            const upperPattern = /[A-Z]/;
+
+            // Validate length
+            if (lengthPattern.test(password)) {
+                length.classList.remove('invalid');
+                length.classList.add('valid');
+            } else {
+                length.classList.remove('valid');
+                length.classList.add('invalid');
+            }
+
+            // Validate number
+            if (numberPattern.test(password)) {
+                number.classList.remove('invalid');
+                number.classList.add('valid');
+            } else {
+                number.classList.remove('valid');
+                number.classList.add('invalid');
+            }
+
+            // Validate special character
+            if (specialPattern.test(password)) {
+                special.classList.remove('invalid');
+                special.classList.add('valid');
+            } else {
+                special.classList.remove('valid');
+                special.classList.add('invalid');
+            }
+
+            // Validate lowercase letter
+            if (lowerPattern.test(password)) {
+                lower.classList.remove('invalid');
+                lower.classList.add('valid');
+            } else {
+                lower.classList.remove('valid');
+                lower.classList.add('invalid');
+            }
+
+            // Validate uppercase letter
+            if (upperPattern.test(password)) {
+                upper.classList.remove('invalid');
+                upper.classList.add('valid');
+            } else {
+                upper.classList.remove('valid');
+                upper.classList.add('invalid');
+            }
+        });
+    </script>
 </body>
 </html>

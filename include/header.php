@@ -51,7 +51,9 @@
 											<ul class="dropdown-menu">
 												<li class="nav-item"> <a class="nav-link" href="profile.php">Profile</a> </li>
 												<!-- <li class="nav-item"> <a class="nav-link" href="request.php">Property Request</a> </li> -->
+                                                <?php  if(isset($_SESSION['utype'])){ if($_SESSION['utype'] == "agent"){ ?>
 												<li class="nav-item"> <a class="nav-link" href="feature.php">Your Property</a> </li>
+                                                <?php } }?>
 												<li class="nav-item"> <a class="nav-link" href="logout.php">Logout</a> </li>	
 											</ul>
                                         </li>
@@ -61,8 +63,10 @@
 										
                                     </ul>
                                     
-									
+									<?php  if(isset($_SESSION['utype'])){ if($_SESSION['utype'] == "agent")
+										{ ?>
 									<a class="btn btn-success d-none d-xl-block" style="border-radius:30px;" href="submitproperty.php">Submit Peoperty</a> 
+                                    <?php } }?>
                                 </div>
                             </nav>
                         </div>

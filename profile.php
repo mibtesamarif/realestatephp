@@ -2,39 +2,43 @@
 ini_set('session.cache_limiter','public');
 session_cache_limiter(false);
 session_start();
+$error="";
+$msg="";
 include("config.php");
-if(!isset($_SESSION['uemail']))
-{
-	header("location:login.php");
-}
+if (isset($_REQUEST['reg'])) {
+    $name = $_REQUEST['name'];
+    $email = $_REQUEST['email'];
+    $phone = $_REQUEST['phone'];
+    $pass = $_REQUEST['pass'];
+    $uimage = $_FILES['uimage']['name'];
+    $temp_name1 = $_FILES['uimage']['tmp_name'];
 
-////// code
-$error='';
-$msg='';
-if(isset($_POST['insert']))
-{
-	$name=$_POST['name'];
-	$phone=$_POST['phone'];
+    // Hash the password using password_hash()
+    $hashed_pass = password_hash($pass, PASSWORD_DEFAULT);
 
-	$content=$_POST['content'];
-	
-	$uid=$_SESSION['uid'];
-	
-	if(!empty($name) && !empty($phone) && !empty($content))
-	{
-		
-		$sql="INSERT INTO feedback (uid,fdescription,status) VALUES ('$uid','$content','0')";
-		   $result=mysqli_query($con, $sql);
-		   if($result){
-			   $msg = "<p class='alert alert-success'>Feedback Send Successfully</p> ";
-		   }
-		   else{
-			   $error = "<p class='alert alert-warning'>Feedback Not Send Successfully</p> ";
-		   }
-	}else{
-		$error = "<p class='alert alert-warning'>Please Fill all the fields</p>";
-	}
-}								
+    try {
+        // Update the user details
+        $sql = "UPDATE user SET uname = :name, uphone = :phone, upass = :pass, uimage = :uimage WHERE uemail = :email";
+        $stmt = $pdo->prepare($sql);
+        $result = $stmt->execute([
+            'name' => $name,
+            'phone' => $phone,
+            'pass' => $hashed_pass,
+            'uimage' => $uimage,
+            'email' => $email
+        ]);
+
+        if ($result) {
+            move_uploaded_file($temp_name1, "admin/user/$uimage");
+            $msg = "<p class='alert alert-success'>Updated Successfully</p>";
+        } else {
+            $error = "<p class='alert alert-warning'>Update Not Successful</p>";
+            echo "<script> location.assign('login.php');</script>";
+        }
+    } catch (PDOException $e) {
+        $error = "<p class='alert alert-danger'>Error: " . $e->getMessage() . "</p>";
+    }
+}					
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -66,6 +70,17 @@ if(isset($_POST['insert']))
 <link rel="stylesheet" type="text/css" href="fonts/flaticon/flaticon.css">
 <link rel="stylesheet" type="text/css" href="css/style.css">
 <link rel="stylesheet" type="text/css" href="css/login.css">
+
+<style>
+        .password-validity {
+            font-size: 0.9rem;
+            color: #dc3545;
+        }
+        .valid {
+            color: #28a745;
+        }
+    </style>
+
 
 <!--	Title
 	=========================================================-->
@@ -122,50 +137,80 @@ if(isset($_POST['insert']))
 					</div>
                 <div class="dashboard-personal-info p-5 bg-white">
                     <form action="#" method="post">
-                        <h5 class="text-secondary border-bottom-on-white pb-3 mb-4">Feedback Form</h5>
+                        <h5 class="text-secondary border-bottom-on-white pb-3 mb-4">User Information</h5>
 						<?php echo $msg; ?><?php echo $error; ?>
+                        <?php 
+									$uid = $_SESSION['uid'];
+
+                                    try {
+                                        $sql = "SELECT * FROM `user` WHERE uid = :uid";
+                                        $stmt = $pdo->prepare($sql);
+                                        $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+                                        $stmt->execute();
+                                    
+                                        // Fetch all results into an array
+                                        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                    
+                                        // Use foreach to iterate over the results
+                                        foreach ($results as $row) {
+								?>
                         <div class="row">
                             <div class="col-lg-6 col-md-12">
                                 <div class="form-group">
-                                    <label for="user-id">Full Name</label>
-                                    <input type="text" name="name" class="form-control" placeholder="Enter Full Name">
+                                    <input type="text"  name="name" value="<?php echo $row['uname'];?>" class="form-control" placeholder="Your Name*">
                                 </div>                
                                 
                                 <div class="form-group">
-                                    <label for="phone">Contact Number</label>
-                                    <input type="number" name="phone"  class="form-control" placeholder="Enter Phone" maxlength="10">
+                                    <input type="email"  name="email" value="<?php echo $row['uemail'];?>" class="form-control" placeholder="Your Email*">
+								</div>
+
+                                <div class="form-group">
+                                    <input type="text"  name="phone" value="<?php echo $row['uphone'];?>" class="form-control" placeholder="Your Phone*" minlength="11" maxlength="11">
+								</div>
+
+                                <div class="form-group">
+                                    <input type="password" name="pass" id="password"  class="form-control" placeholder="Your Password*">
+                                    <small id="passwordHelp" class="form-text text-muted password-validity">
+                                        <ul>
+                                            <li id="length" class="invalid">Length: 8-16 characters</li>
+                                            <li id="number" class="invalid">At least one number</li>
+                                            <li id="special" class="invalid">At least one special character</li>
+                                            <li id="lower" class="invalid">At least one lowercase letter</li>
+                                            <li id="upper" class="invalid">At least one uppercase letter</li>
+                                        </ul>
+                                    </small>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="about-me">Your Feedback</label>
-                                    <textarea class="form-control" name="content" rows="7" placeholder="Enter Text Here...."></textarea>
+                                    <label class="col-form-label"><b>User Image</b></label>
+                                    <input class="form-control" name="uimage" type="file">
                                 </div>
-                                <input type="submit" class="btn btn-info mb-4" name="insert" value="Send Feedback">
+
+                                <button class="btn btn-success" name="update" value="Register" type="submit">Save</button>
                             </div>
 							</form>
                             <div class="col-lg-1"></div>
                             <div class="col-lg-5 col-md-12">
-								<?php 
-									$uid=$_SESSION['uid'];
-									$query=mysqli_query($con,"SELECT * FROM `user` WHERE uid='$uid'");
-									while($row=mysqli_fetch_array($query))
-									{
-								?>
-                                <div class="user-info mt-md-50"> <img src="admin/user/<?php echo $row['6'];?>" alt="userimage">
+								
+                                <div class="user-info mt-md-50"> <img src="admin/user/<?php echo $row['uimage'];?>" alt="userimage">
                                     <div class="mb-4 mt-3">
                                         
                                     </div>
 									
                                     <div class="font-18">
-                                        <div class="mb-1 text-capitalize"><b>Name:</b> <?php echo $row['1'];?></div>
-                                        <div class="mb-1"><b>Email:</b> <?php echo $row['2'];?></div>
-                                        <div class="mb-1"><b>Contact:</b> <?php echo $row['3'];?></div>
-										<div class="mb-1 text-capitalize"><b>Role:</b> <?php echo $row['5'];?></div>
+                                        <div class="mb-1 text-capitalize"><b>Name:</b> <?php echo $row['uname'];?></div>
+                                        <div class="mb-1"><b>Email:</b> <?php echo $row['uemail'];?></div>
+                                        <div class="mb-1"><b>Contact:</b> <?php echo $row['uphone'];?></div>
+										<div class="mb-1 text-capitalize"><b>Role:</b> <?php echo $row['utype'];?></div>
                                     </div>
-									<?php } ?>
+									
                                 </div>
                             </div>
                         </div>
+                        <?php }
+                                            } catch (PDOException $e) {
+                                            echo "Error: " . $e->getMessage();
+                                            } ?>
                     
                 </div>            
             </div>
@@ -201,5 +246,67 @@ if(isset($_POST['insert']))
 <script src="js/jquery.slider.js"></script> 
 <script src="js/wow.js"></script> 
 <script src="js/custom.js"></script>
+
+<script>
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const length = document.getElementById('length');
+            const number = document.getElementById('number');
+            const special = document.getElementById('special');
+            const lower = document.getElementById('lower');
+            const upper = document.getElementById('upper');
+
+            const lengthPattern = /^.{8,16}$/;
+            const numberPattern = /\d/;
+            const specialPattern = /[!@#$%^&*(),.?":{}|<>]/;
+            const lowerPattern = /[a-z]/;
+            const upperPattern = /[A-Z]/;
+
+            // Validate length
+            if (lengthPattern.test(password)) {
+                length.classList.remove('invalid');
+                length.classList.add('valid');
+            } else {
+                length.classList.remove('valid');
+                length.classList.add('invalid');
+            }
+
+            // Validate number
+            if (numberPattern.test(password)) {
+                number.classList.remove('invalid');
+                number.classList.add('valid');
+            } else {
+                number.classList.remove('valid');
+                number.classList.add('invalid');
+            }
+
+            // Validate special character
+            if (specialPattern.test(password)) {
+                special.classList.remove('invalid');
+                special.classList.add('valid');
+            } else {
+                special.classList.remove('valid');
+                special.classList.add('invalid');
+            }
+
+            // Validate lowercase letter
+            if (lowerPattern.test(password)) {
+                lower.classList.remove('invalid');
+                lower.classList.add('valid');
+            } else {
+                lower.classList.remove('valid');
+                lower.classList.add('invalid');
+            }
+
+            // Validate uppercase letter
+            if (upperPattern.test(password)) {
+                upper.classList.remove('invalid');
+                upper.classList.add('valid');
+            } else {
+                upper.classList.remove('valid');
+                upper.classList.add('invalid');
+            }
+        });
+    </script>
 </body>
 </html>

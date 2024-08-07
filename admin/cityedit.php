@@ -1,10 +1,10 @@
 <?php
 session_start();
 include("config.php"); 
-// if(!isset($_SESSION['auser']))
-// {
-// 	header("location:index.php");
-// }
+if(!isset($_SESSION['auser']))
+{
+	header("location:index.php");
+}
 ///code
 $error="";
 $msg="";

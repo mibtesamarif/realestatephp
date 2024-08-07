@@ -83,27 +83,38 @@ include("config.php");
 				
 				<?php 
 					
-					$query=mysqli_query($con,"SELECT * FROM about");
-					while($row=mysqli_fetch_array($query))
-					{
+                    try {
+                        // Assuming PDO connection is established and stored in $pdo
+                        $sql = "SELECT * FROM about";
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->execute();
+                    
+                        // Fetch all results into an array
+                        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    
+                        // Use foreach loop to iterate over the results
+                        foreach ($results as $row) {
 				?>
 				<div class="row">
                     <div class="col-md-12 col-lg-12">
-                        <h3 class="double-down-line-left text-secondary position-relative pb-4 mb-4"><?php echo $row['1'];?></h3>
+                        <h3 class="double-down-line-left text-secondary position-relative pb-4 mb-4"><?php echo $row['title'];?></h3>
                     </div>
                 </div>
                 <div class="row about-company">
                     <div class="col-md-12 col-lg-7">
                         <div class="about-content">
-                            <?php echo $row['2'];?>
+                            <?php echo $row['content'];?>
                         </div>
                     </div>
                     <div class="col-md-12 col-lg-5 mt-5">
-                        <div class="about-img"> <img src="admin/upload/<?php echo $row['3'];?>" alt="about image"> </div>
+                        <div class="about-img"> <img src="admin/upload/<?php echo $row['image'];?>" alt="about image"> </div>
                     </div>
                 </div>
 				
-				<?php } ?>
+				<?php }
+                    } catch (PDOException $e) {
+                        echo "Error: " . $e->getMessage();
+                    } ?>
 				
             </div>
         </div>

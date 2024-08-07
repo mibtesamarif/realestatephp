@@ -2,7 +2,7 @@
 	session_start();
 	include("config.php");
 	$_SESSION['auser'] = "admin";
-	header("Location: dashboard.php");
+	//header("Location: dashboard.php");
 
 	if (isset($_POST['login'])) {
 		$user = $_POST['user'];
