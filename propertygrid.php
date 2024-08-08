@@ -86,137 +86,108 @@ include("config.php");
         <!--	Property Grid
 		===============================================================-->
         <div class="full-row">
-            <div class="container">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
                 <div class="row">
-				
-					<div class="col-lg-8">
-                        <div class="row">
-						<!-- FOR MORE PROJECTS visit: freeprojectscodes.com -->
-							<?php 
-							
-							if(isset($_REQUEST['filter']))
-							{
-								$type=$_REQUEST['type'];
-								$stype=$_REQUEST['stype'];
-								$city=$_REQUEST['city'];
-								
-								$sql="SELECT property.*, user.uname FROM `property`,`user` WHERE property.uid=user.uid and type='{$type}' and stype='{$stype}' and city='{$city}'";
-								//SELECT * FROM `property` WHERE type='office' or type='office' and stype='sale' or stype='rent' and city='valsad' OR state='mumbai'
-								//SELECT * FROM `property` WHERE type='office' and stype='sale'  and city='valsad' OR state='mumbai'
-								$result=mysqli_query($con,$sql);
-							
-								if(mysqli_num_rows($result)>0)
-								{
-									if($result == true)
-									{
-										while($row=mysqli_fetch_array($result))
-										{
-							?>
-									
-                            <div class="col-md-6">
-                                <div class="featured-thumb hover-zoomer mb-4">
-                                    <div class="overlay-black overflow-hidden position-relative"> <img src="admin/property/<?php echo $row['18'];?>" alt="pimage">
-                                        
-                                        <div class="sale bg-success text-white">For <?php echo $row['5'];?></div>
-                                        <div class="price text-primary text-capitalize">$<?php echo $row['13'];?> <span class="text-white"><?php echo $row['12'];?> Sqft</span></div>
-                                        
-                                    </div>
-                                    <div class="featured-thumb-data shadow-one">
-                                        <div class="p-4">
-                                            <h5 class="text-secondary hover-text-success mb-2 text-capitalize"><a href="propertydetail.php?pid=<?php echo $row['0'];?>"><?php echo $row['1'];?></a></h5>
-                                            <span class="location text-capitalize"><i class="fas fa-map-marker-alt text-success"></i> <?php echo $row['14'];?></span> </div>
-                                        <div class="px-4 pb-4 d-inline-block w-100">
-                                            <div class="float-left text-capitalize"><i class="fas fa-user text-success mr-1"></i>By : <?php echo $row['uname'];?></div>
-                                            <div class="float-right"><i class="far fa-calendar-alt text-success mr-1"></i> <?php echo date('d-m-Y', strtotime($row['date']));?></div>
+                    <!-- FOR MORE PROJECTS visit: freeprojectscodes.com -->
+                    <?php
+                    if (isset($_REQUEST['filter'])) {
+                        $type = $_REQUEST['type'];
+                        $stype = $_REQUEST['stype'];
+                        $city = $_REQUEST['city'];
+
+                        $sql = "SELECT property.*, user.uname FROM property JOIN user ON property.uid = user.uid WHERE type = :type AND stype = :stype AND city = :city";
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->execute([':type' => $type, ':stype' => $stype, ':city' => $city]);
+
+                        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                        if (count($results) > 0) {
+                            foreach ($results as $row) {
+                    ?>
+                                <div class="col-md-6">
+                                    <div class="featured-thumb hover-zoomer mb-4">
+                                        <div class="overlay-black overflow-hidden position-relative">
+                                            <img src="admin/property/<?php echo $row['18']; ?>" alt="pimage">
+                                            <div class="sale bg-success text-white">For <?php echo $row['5']; ?></div>
+                                            <div class="price text-primary text-capitalize">$<?php echo $row['13']; ?> <span class="text-white"><?php echo $row['12']; ?> Sqft</span></div>
+                                        </div>
+                                        <div class="featured-thumb-data shadow-one">
+                                            <div class="p-4">
+                                                <h5 class="text-secondary hover-text-success mb-2 text-capitalize"><a href="propertydetail.php?pid=<?php echo $row['0']; ?>"><?php echo $row['1']; ?></a></h5>
+                                                <span class="location text-capitalize"><i class="fas fa-map-marker-alt text-success"></i> <?php echo $row['14']; ?></span>
+                                            </div>
+                                            <div class="px-4 pb-4 d-inline-block w-100">
+                                                <div class="float-left text-capitalize"><i class="fas fa-user text-success mr-1"></i>By : <?php echo $row['uname']; ?></div>
+                                                <div class="float-right"><i class="far fa-calendar-alt text-success mr-1"></i> <?php echo date('d-m-Y', strtotime($row['date'])); ?></div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div><!-- FOR MORE PROJECTS visit: freeprojectscodes.com -->
-                            <?php 		
-										} 
-					
-									}
-								}
-								else {
-									
-									echo "<h1 class='mb-5'><center>No Property Available</center></h1>";
-								}
-									
-							}
-
-							?>
-                            
-
-                            
-                            
-                        <!--    <div class="col-md-12">
-                                <nav aria-label="Page navigation">
-                                    <ul class="pagination justify-content-center mt-4">
-                                        <li class="page-item disabled"> <span class="page-link">Previous</span> </li>
-                                        <li class="page-item active" aria-current="page"> <span class="page-link"> 1 <span class="sr-only">(current)</span> </span> </li>
-                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                        <li class="page-item">...</li>
-                                        <li class="page-item"><a class="page-link" href="#">5</a></li>
-                                        <li class="page-item"> <a class="page-link" href="#">Next</a> </li>
-                                    </ul>
-                                </nav>
-                            </div>  -->
-                        </div>
-                    </div><!-- FOR MORE PROJECTS visit: freeprojectscodes.com -->
-					
-                    <div class="col-lg-4">
-                        <div class="sidebar-widget">
-                            <h4 class="double-down-line-left text-secondary position-relative pb-4 my-4">Instalment Calculator</h4>
-						<form class="d-inline-block w-100" action="calc.php" method="post">
-                            <label class="sr-only">Property Amount</label>
-                            <div class="input-group mb-2 mr-sm-2">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text">$</div>
-                                </div>
-                                <input type="text" class="form-control" name="amount" placeholder="Property Price">
+                            <?php
+                            }
+                        } else {
+                            echo "<h1 class='mb-5'><center>No Property Available</center></h1>";
+                        }
+                    }
+                    ?>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="sidebar-widget">
+                    <h4 class="double-down-line-left text-secondary position-relative pb-4 my-4">Instalment Calculator</h4>
+                    <form class="d-inline-block w-100" action="calc.php" method="post">
+                        <label class="sr-only">Property Amount</label>
+                        <div class="input-group mb-2 mr-sm-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">$</div>
                             </div>
-                            <label class="sr-only">Month</label>
-                            <div class="input-group mb-2 mr-sm-2">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text"><i class="far fa-calendar-alt"></i></div>
-                                </div>
-                                <input type="text" class="form-control" name="month" placeholder="Duration Year">
-                            </div>
-                            <label class="sr-only">Interest Rate</label>
-                            <div class="input-group mb-2 mr-sm-2">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text">%</div>
-                                </div>
-                                <input type="text" class="form-control" name="interest" placeholder="Interest Rate">
-                            </div>
-                            <button type="submit" value="submit" name="calc" class="btn btn-danger mt-4">Calculate Instalment</button>
-                        </form>
+                            <input type="text" class="form-control" name="amount" placeholder="Property Price">
                         </div>
-                        
-                        <div class="sidebar-widget mt-5">
-                            <h4 class="double-down-line-left text-secondary position-relative pb-4 mb-4">Recently Added Property</h4>
-                            <ul class="property_list_widget">
-							
-								<?php 
-								$query=mysqli_query($con,"SELECT * FROM `property` ORDER BY date DESC LIMIT 6");
-										while($row=mysqli_fetch_array($query))
-										{
-								?>
-                                <li> <img src="admin/property/<?php echo $row['18'];?>" alt="pimage">
-                                    <h6 class="text-secondary hover-text-success text-capitalize"><a href="propertydetail.php?pid=<?php echo $row['0'];?>"><?php echo $row['1'];?></a></h6>
-                                    <span class="font-14"><i class="fas fa-map-marker-alt icon-success icon-small"></i> <?php echo $row['14'];?></span>
-                                    
-                                </li>
-                                <?php } ?>
+                        <label class="sr-only">Month</label>
+                        <div class="input-group mb-2 mr-sm-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text"><i class="far fa-calendar-alt"></i></div>
+                            </div>
+                            <input type="text" class="form-control" name="month" placeholder="Duration Year">
+                        </div>
+                        <label class="sr-only">Interest Rate</label>
+                        <div class="input-group mb-2 mr-sm-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">%</div>
+                            </div>
+                            <input type="text" class="form-control" name="interest" placeholder="Interest Rate">
+                        </div>
+                        <button type="submit" value="submit" name="calc" class="btn btn-danger mt-4">Calculate Instalment</button>
+                    </form>
+                </div>
 
-                            </ul>
-                        </div>
-                    </div>
-                    
+                <div class="sidebar-widget mt-5">
+                    <h4 class="double-down-line-left text-secondary position-relative pb-4 mb-4">Recently Added Property</h4>
+                    <ul class="property_list_widget">
+                        <?php
+                        $stmt = $pdo->prepare("SELECT * FROM property ORDER BY date DESC LIMIT 6");
+                        $stmt->execute();
+                        $recentProperties = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                        foreach ($recentProperties as $row) {
+                        ?>
+                            <li>
+                                <img src="admin/property/<?php echo $row['18']; ?>" alt="pimage">
+                                <h6 class="text-secondary hover-text-success text-capitalize"><a href="propertydetail.php?pid=<?php echo $row['0']; ?>"><?php echo $row['1']; ?></a></h6>
+                                <span class="font-14"><i class="fas fa-map-marker-alt icon-success icon-small"></i> <?php echo $row['14']; ?></span>
+                            </li>
+                        <?php
+                        }
+                        ?>
+                    </ul>
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
 
         
         <!--	Footer   start-->

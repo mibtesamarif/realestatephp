@@ -97,7 +97,7 @@ include("config.php");
                                     JOIN user ON property.uid = user.uid 
                                     WHERE property.pid = :id";
                             $stmt = $pdo->prepare($sql);
-                            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+                            $stmt->bindParam(':id', $id);
                             $stmt->execute();
 
                             // Fetch all results into an array
@@ -129,6 +129,7 @@ include("config.php");
                                 </div>
                             </div>
                         </div><!-- FOR MORE PROJECTS visit: freeprojectscodes.com -->
+        
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <div class="bg-success d-table px-3 py-2 rounded text-white text-capitalize">For <?php echo $row['stype'];?></div>
@@ -185,19 +186,7 @@ include("config.php");
 								<?php echo $row['feature'];?>
 								
                             </div>   
-							<!-- FOR MORE PROJECTS visit: freeprojectscodes.com -->
-                            <h5 class="mt-5 mb-4 text-secondary">Floor Plans</h5>
-                            <div class="accordion" id="accordionExample">
-                                <button class="bg-gray hover-bg-success hover-text-white text-ordinary py-3 px-4 mb-1 w-100 text-left rounded position-relative" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne"> Floor Plans </button>
-                                <div id="collapseOne" class="collapse show p-4" aria-labelledby="headingOne" data-parent="#accordionExample">
-                                    <img src="admin/property/<?php echo $row['mapimage'];?>" alt="Not Available"> </div>
-                                <button class="bg-gray hover-bg-success hover-text-white text-ordinary py-3 px-4 mb-1 w-100 text-left rounded position-relative collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">topmapimage</button>
-                                <div id="collapseTwo" class="collapse p-4" aria-labelledby="headingTwo" data-parent="#accordionExample">
-                                    <img src="admin/property/<?php echo $row['26'];?>" alt="Not Available"> </div>
-                                <button class="bg-gray hover-bg-success hover-text-white text-ordinary py-3 px-4 mb-1 w-100 text-left rounded position-relative collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">groundmapimage	</button>
-                                <div id="collapseThree" class="collapse p-4" aria-labelledby="headingThree" data-parent="#accordionExample">
-                                    <img src="admin/property/<?php echo $row['27'];?>" alt="Not Available"> </div>
-                            </div>
+						
 
                             <h5 class="mt-5 mb-4 text-secondary double-down-line-left position-relative">Contact Agent</h5>
                             <div class="agent-contact pt-60">
@@ -319,23 +308,32 @@ include("config.php");
                         </ul>
 
                         <div class="sidebar-widget mt-5">
-                            <h4 class="double-down-line-left text-secondary position-relative pb-4 mb-4">Recently Added Property</h4>
-                            <ul class="property_list_widget">
-							
-								<?php 
-								$query=mysqli_query($con,"SELECT * FROM `property` ORDER BY date DESC LIMIT 7");
-										while($row=mysqli_fetch_array($query))
-										{
-								?>
-                                <li> <img src="admin/property/<?php echo $row['18'];?>" alt="pimage">
-                                    <h6 class="text-secondary hover-text-success text-capitalize"><a href="propertydetail.php?pid=<?php echo $row['0'];?>"><?php echo $row['1'];?></a></h6>
-                                    <span class="font-14"><i class="fas fa-map-marker-alt icon-success icon-small"></i> <?php echo $row['14'];?></span>
-                                    
-                                </li>
-                                <?php } ?>
+    <h4 class="double-down-line-left text-secondary position-relative pb-4 mb-4">Recently Added Property</h4>
+    <ul class="property_list_widget">
+        <?php
+        // Prepare and execute the PDO query to get the recently added properties
+        $stmt = $pdo->prepare("SELECT * FROM property ORDER BY date DESC LIMIT 7");
+        $stmt->execute();
+        $recentProperties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                            </ul>
-                        </div>
+        // Loop through the results and display each property
+        foreach ($recentProperties as $row) {
+        ?>
+            <li>
+                <img src="admin/property/<?php echo $row['pimage']; ?>" alt="pimage">
+                <h6 class="text-secondary hover-text-success text-capitalize">
+                    <a href="propertydetail.php?pid=<?php echo $row['pid']; ?>"><?php echo $row['title']; ?></a>
+                </h6>
+                <span class="font-14">
+                    <i class="fas fa-map-marker-alt icon-success icon-small"></i> <?php echo ($row['location']); ?>
+                </span>
+            </li>
+        <?php
+        }
+        ?>
+    </ul>
+</div>
+
                     </div>
                 </div>
             </div>
