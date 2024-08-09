@@ -10,26 +10,46 @@ if(isset($_REQUEST['insert']))
 	$dob=$_REQUEST['dob'];
 	$phone=$_REQUEST['phone'];
 	
-	if(!empty($name) && !empty($email) && !empty($pass)  && !empty($dob) && !empty($phone))
-	{
-		$sql="insert into admin (auser,aemail,apass,adob,aphone) values('$name','$email','$pass','$dob','$phone')";
-		$result=mysqli_query($con,$sql);
-		if($result)
-			{
-				$msg='Admin Register Successfully';
-				
-						
-			}
-			else
-			{
-				$error='* Not Register Admin Try Again';
-			}
-	}
-	else{
-		$error="* Please Fill all the Fields!";
-	}
-	
-	
+	$hashed_pass =  password_hash($pass, PASSWORD_DEFAULT);
+
+
+    try {
+
+        // Check if email already exists
+        $query = "SELECT * FROM admin WHERE aemail = :email";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute(['email' => $email]);
+        $num = $stmt->rowCount();
+
+        if($num == 1) {
+            $error = "<p class='alert alert-warning'>Email Id already exists</p>";
+        } else {
+            if(!empty($name) && !empty($email) && !empty($phone) && !empty($pass) && !empty($phone)) {
+                $sql = "INSERT INTO admin (auser, aemail, apass, adob, aphone) VALUES (:auser, :aemail, :apass, :adob, :aphone)";
+                $stmt = $pdo->prepare($sql);
+                $result = $stmt->execute([
+                    'auser' => $name,
+                    'aemail' => $email,
+                    'apass' => $hashed_pass,
+                    'adob' => $dob,
+                    'aphone' => $phone
+                    
+                ]);
+
+                if($result) {
+                  
+                    $msg = "<p class='alert alert-success'>Registered Successfully</p>";
+                } else {
+                    $error = "<p class='alert alert-warning'>Registration Not Successful</p>";
+                    echo "<script> location.assign('login.php');</script>";
+                }
+            } else {
+                $error = "<p class='alert alert-warning'>Please Fill all the fields</p>";
+            }
+        }
+    } catch (PDOException $e) {
+        $error = "<p class='alert alert-danger'>Error: " . $e->getMessage() . "</p>";
+    }
 }
 ?>
 <!DOCTYPE html>

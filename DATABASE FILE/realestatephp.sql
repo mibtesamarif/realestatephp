@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 05, 2022 at 11:56 AM
+-- Generation Time: Aug 09, 2024 at 08:25 PM
 -- Server version: 10.4.22-MariaDB
--- PHP Version: 7.4.27
+-- PHP Version: 8.1.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -51,7 +51,7 @@ CREATE TABLE `admin` (
   `aid` int(10) NOT NULL,
   `auser` varchar(50) NOT NULL,
   `aemail` varchar(50) NOT NULL,
-  `apass` varchar(50) NOT NULL,
+  `apass` varchar(200) NOT NULL,
   `adob` date NOT NULL,
   `aphone` varchar(15) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -61,7 +61,7 @@ CREATE TABLE `admin` (
 --
 
 INSERT INTO `admin` (`aid`, `auser`, `aemail`, `apass`, `adob`, `aphone`) VALUES
-(9, 'admin', 'admin@gmail.com', 'ed775fc7100d30f0ff6c1dbff1a6fb11f349a17a', '1994-12-06', '1470002569');
+(1, 'kinza', 'kinza@gmail.com', '$2y$10$cUDGuDOVSux/ilbjihBJ/uX2PXX33qMF6o6lsPjN4DkvVyHRVLLnK', '2024-08-06', '0321345678');
 
 -- --------------------------------------------------------
 
@@ -212,7 +212,7 @@ CREATE TABLE `user` (
   `uname` varchar(100) NOT NULL,
   `uemail` varchar(100) NOT NULL,
   `uphone` varchar(20) NOT NULL,
-  `upass` varchar(50) NOT NULL,
+  `upass` varchar(200) NOT NULL,
   `utype` varchar(50) NOT NULL,
   `uimage` varchar(300) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -222,15 +222,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`uid`, `uname`, `uemail`, `uphone`, `upass`, `utype`, `uimage`) VALUES
-(28, 'Christine', 'christine@mail.com', '7777444455', '6812f136d636e737248d365016f8cfd5139e387c', 'user', 'gr7.png'),
-(29, 'Alice Howard', 'howarda@mail.com', '7775552214', '6812f136d636e737248d365016f8cfd5139e387c', 'agent', 'avatarm2-min.jpg'),
-(30, 'Thomas Olson', 'thomas@mail.com', '7896665555', '6812f136d636e737248d365016f8cfd5139e387c', 'user', 'avatarm7-min.jpg'),
-(31, 'Cynthia N. Moore', 'moore@mail.com', '7896547855', '6812f136d636e737248d365016f8cfd5139e387c', 'agent', 'user-default-3-min.png'),
-(32, 'Carl Jones', 'carl@mail.com', '1458887969', '6812f136d636e737248d365016f8cfd5139e387c', 'agent', 'user-profile-min.png'),
-(33, 'Noah Stones', 'noah@mail.com', '7965555544', '6812f136d636e737248d365016f8cfd5139e387c', 'user', 'usersys-min.png'),
-(34, 'Fred Godines', 'fred@mail.com', '7850002587', '6812f136d636e737248d365016f8cfd5139e387c', 'builder', 'user-a-min.png'),
-(35, 'Michael', 'michael@mail.com', '8542221140', '6812f136d636e737248d365016f8cfd5139e387c', 'user', 'usric.png'),
-(36, 'darkseid', 'darkseid@gmail.com', '9434343655', 'ed775fc7100d30f0ff6c1dbff1a6fb11f349a17a', 'builder', 'Real Estate Management System in PHP with Source Code.jpg');
+(2, 'Asad', 'asad@gmail.com', '03052563576', '$2y$10$STfhHGEyo5zUDU4blXVN8OP8q3q6wUEY/MI7/fdxJGCZdAx2FWhb2', 'user', 'about-img-3.jpg');
 
 --
 -- Indexes for dumped tables
@@ -298,7 +290,7 @@ ALTER TABLE `about`
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `aid` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `aid` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `city`
@@ -334,7 +326,7 @@ ALTER TABLE `state`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `uid` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `uid` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -12,7 +12,8 @@ if(isset($_REQUEST['reg'])) {
     $temp_name1 = $_FILES['uimage']['tmp_name'];
 
     // Hash the password using password_hash()
-    $hashed_pass = password_hash($pass, PASSWORD_DEFAULT);
+    $hashed_pass =  password_hash($pass, PASSWORD_DEFAULT);
+
 
     try {
 
