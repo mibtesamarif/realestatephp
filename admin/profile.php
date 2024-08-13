@@ -1,11 +1,15 @@
 <?php
+session_start();
 require("config.php");
+
 //code
  
 // if(!isset($_SESSION['auser']))
 // {
 // 	header("location:index.php");
 // }
+$error="";
+$msg="";
 
 if (isset($_REQUEST['insert'])) {
     $name = $_REQUEST['name'];
@@ -13,25 +17,33 @@ if (isset($_REQUEST['insert'])) {
     $pass = $_REQUEST['pass'];
     $dob = $_REQUEST['dob'];
     $phone = $_REQUEST['phone'];
-    $auser = "admin";
+    $auser = $_SESSION['auser'];
 
-    if (!empty($name) && !empty($email) && !empty($pass) && !empty($dob) && !empty($phone)) {
+    if (!empty($name) && !empty($email) && !empty($dob) && !empty($phone)) {
         try {
-            // Hash the password
-            $hashedPass = password_hash($pass, PASSWORD_DEFAULT);
-            
-            // Prepare the SQL statement
-            $sql = "UPDATE admin SET auser = :name, aemail = :email, apass = :pass, adob = :dob, aphone = :phone WHERE auser = :auser";
-            $stmt = $pdo->prepare($sql);
-            
-            // Bind the parameters
+            if (!empty($pass)) {
+                // Hash the password
+                $hashedPass = password_hash($pass, PASSWORD_DEFAULT);
+
+                // Prepare the SQL statement with password
+                $sql = "UPDATE admin SET auser = :name, aemail = :email, apass = :pass, adob = :dob, aphone = :phone WHERE auser = :auser";
+                $stmt = $pdo->prepare($sql);
+
+                // Bind the parameters including password
+                $stmt->bindParam(':pass', $hashedPass);
+            } else {
+                // Prepare the SQL statement without password
+                $sql = "UPDATE admin SET auser = :name, aemail = :email, adob = :dob, aphone = :phone WHERE auser = :auser";
+                $stmt = $pdo->prepare($sql);
+            }
+
+            // Bind the common parameters
             $stmt->bindParam(':name', $name);
             $stmt->bindParam(':email', $email);
-            $stmt->bindParam(':pass', $hashedPass);
             $stmt->bindParam(':dob', $dob);
             $stmt->bindParam(':phone', $phone);
             $stmt->bindParam(':auser', $auser);
-            
+
             // Execute the statement
             if ($stmt->execute()) {
                 $msg = 'Admin Updated Successfully';
@@ -47,9 +59,9 @@ if (isset($_REQUEST['insert'])) {
 }
 
 // Fetch the admin data
-$id = "admin"; //$_SESSION['auser'];
+$id = $_SESSION['auser'];
 try {
-    $stmt = $pdo->prepare("SELECT * FROM admin WHERE auser = :auser LIMIT 1");
+    $stmt = $pdo->prepare("SELECT * FROM admin WHERE auser = :auser");
     $stmt->bindParam(':auser', $id);
     $stmt->execute();
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -191,6 +203,8 @@ try {
 																	<div class="form-group mb-0">
 																		<input class="btn btn-primary btn-block" type="submit" name="insert" Value="Update">
 																	</div>
+																	<p style="color:red;"><?php echo $error; ?></p>
+																	<p style="color:green;"><?php echo $msg; ?></p>
 																	</span>
 																</div>
 															</form>
