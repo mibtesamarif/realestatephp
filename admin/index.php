@@ -28,7 +28,7 @@ if (isset($_REQUEST['login'])) {
                     $_SESSION['aemail'] = $row['aemail'];
 
                     // Redirect to form.php
-                    header("Location: form.php");
+                    header("Location: dashboard.php");
                     exit(); // Ensure no further code is executed
                 } else {
                     // Debugging: Log incorrect password attempt
