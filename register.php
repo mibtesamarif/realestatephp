@@ -41,6 +41,7 @@ if(isset($_REQUEST['reg'])) {
                 if($result) {
                     move_uploaded_file($temp_name1, "admin/user/$uimage");
                     $msg = "<p class='alert alert-success'>Registered Successfully</p>";
+                    echo "<script>location.assign'login.php';</script>";
                 } else {
                     $error = "<p class='alert alert-warning'>Registration Not Successful</p>";
                     echo "<script> location.assign('login.php');</script>";
