@@ -3,87 +3,116 @@ ini_set('session.cache_limiter','public');
 session_cache_limiter(false);
 session_start();
 include("config.php");
-if(!isset($_SESSION['uemail']))
-{
-	header("location:login.php");
+
+if(!isset($_SESSION['uemail'])) {
+    header("location:login.php");
 }
 
-//// code insert
-//// add code
-$error="";
-$msg="";
-if(isset($_POST['add']))
-{
-	
-	$title=$_POST['title'];
-	$content=$_POST['content'];
-	$ptype=$_POST['ptype'];
-	$bhk=$_POST['bhk'];
-	$bed=$_POST['bed'];
-	$balc=$_POST['balc'];
-	$hall=$_POST['hall'];
-	$stype=$_POST['stype'];
-	$bath=$_POST['bath'];
-	$kitc=$_POST['kitc'];
-	$floor=$_POST['floor'];
-	$price=$_POST['price'];
-	$city=$_POST['city'];
-	$asize=$_POST['asize'];
-	$loc=$_POST['loc'];
-	$state=$_POST['state'];
-	$status=$_POST['status'];
-	$uid=$_SESSION['uid'];
-	$feature=$_POST['feature'];
-	
-	$totalfloor=$_POST['totalfl'];
+$error = "";
+$msg = "";
 
-	$isFeatured=$_POST['isFeatured'];
-	
-	$aimage=$_FILES['aimage']['name'];
-	$aimage1=$_FILES['aimage1']['name'];
-	$aimage2=$_FILES['aimage2']['name'];
-	$aimage3=$_FILES['aimage3']['name'];
-	$aimage4=$_FILES['aimage4']['name'];
-	
-	$fimage=$_FILES['fimage']['name'];
-	$fimage1=$_FILES['fimage1']['name'];
-	$fimage2=$_FILES['fimage2']['name'];
-	
-	$temp_name  =$_FILES['aimage']['tmp_name'];
-	$temp_name1 =$_FILES['aimage1']['tmp_name'];
-	$temp_name2 =$_FILES['aimage2']['tmp_name'];
-	$temp_name3 =$_FILES['aimage3']['tmp_name'];
-	$temp_name4 =$_FILES['aimage4']['tmp_name'];
-	
-	$temp_name5 =$_FILES['fimage']['tmp_name'];
-	$temp_name6 =$_FILES['fimage1']['tmp_name'];
-	$temp_name7 =$_FILES['fimage2']['tmp_name'];
-	
-	move_uploaded_file($temp_name,"admin/property/$aimage");
-	move_uploaded_file($temp_name1,"admin/property/$aimage1");
-	move_uploaded_file($temp_name2,"admin/property/$aimage2");
-	move_uploaded_file($temp_name3,"admin/property/$aimage3");
-	move_uploaded_file($temp_name4,"admin/property/$aimage4");
-	
-	move_uploaded_file($temp_name5,"admin/property/$fimage");
-	move_uploaded_file($temp_name6,"admin/property/$fimage1");
-	move_uploaded_file($temp_name7,"admin/property/$fimage2");
-	
-	$sql="insert into property (title,pcontent,type,bhk,stype,bedroom,bathroom,balcony,kitchen,hall,floor,size,price,location,city,state,feature,pimage,pimage1,pimage2,pimage3,pimage4,uid,status,mapimage,topmapimage,groundmapimage,totalfloor, isFeatured)
-	values('$title','$content','$ptype','$bhk','$stype','$bed','$bath','$balc','$kitc','$hall','$floor','$asize','$price',
-	'$loc','$city','$state','$feature','$aimage','$aimage1','$aimage2','$aimage3','$aimage4','$uid','$status','$fimage','$fimage1','$fimage2','$totalfloor', '$isFeatured')";
-	$result=mysqli_query($con,$sql);
-	if($result)
-		{
-			$msg="<p class='alert alert-success'>Property Inserted Successfully</p>";
-					
-		}
-		else
-		{
-			$error="<p class='alert alert-warning'>Property Not Inserted Some Error</p>";
-		}
+if(isset($_POST['add'])) {
+    // Collect form data
+    $title = $_POST['title'];
+    $content = $_POST['content'];
+    $ptype = $_POST['ptype'];
+    $bhk = $_POST['bhk'];
+    $bed = $_POST['bed'];
+    $balc = $_POST['balc'];
+    $hall = $_POST['hall'];
+    $stype = $_POST['stype'];
+    $bath = $_POST['bath'];
+    $kitc = $_POST['kitc'];
+    $floor = $_POST['floor'];
+    $price = $_POST['price'];
+    $city = $_POST['city'];
+    $asize = $_POST['asize'];
+    $loc = $_POST['loc'];
+    $state = $_POST['state'];
+    $status = $_POST['status'];
+    $uid = $_SESSION['uid'];
+    $feature = $_POST['feature'];
+    $totalfloor = $_POST['totalfl'];
+    $isFeatured = $_POST['isFeatured'];
+
+    // File uploads
+    $aimage = $_FILES['aimage']['name'];
+    $aimage1 = $_FILES['aimage1']['name'];
+    $aimage2 = $_FILES['aimage2']['name'];
+    $aimage3 = $_FILES['aimage3']['name'];
+    $aimage4 = $_FILES['aimage4']['name'];
+    $fimage = $_FILES['fimage']['name'];
+    $fimage1 = $_FILES['fimage1']['name'];
+    $fimage2 = $_FILES['fimage2']['name'];
+
+    // Temporary file names
+    $temp_name = $_FILES['aimage']['tmp_name'];
+    $temp_name1 = $_FILES['aimage1']['tmp_name'];
+    $temp_name2 = $_FILES['aimage2']['tmp_name'];
+    $temp_name3 = $_FILES['aimage3']['tmp_name'];
+    $temp_name4 = $_FILES['aimage4']['tmp_name'];
+    $temp_name5 = $_FILES['fimage']['tmp_name'];
+    $temp_name6 = $_FILES['fimage1']['tmp_name'];
+    $temp_name7 = $_FILES['fimage2']['tmp_name'];
+
+    // Move uploaded files
+    move_uploaded_file($temp_name, "admin/property/$aimage");
+    move_uploaded_file($temp_name1, "admin/property/$aimage1");
+    move_uploaded_file($temp_name2, "admin/property/$aimage2");
+    move_uploaded_file($temp_name3, "admin/property/$aimage3");
+    move_uploaded_file($temp_name4, "admin/property/$aimage4");
+    move_uploaded_file($temp_name5, "admin/property/$fimage");
+    move_uploaded_file($temp_name6, "admin/property/$fimage1");
+    move_uploaded_file($temp_name7, "admin/property/$fimage2");
+
+    // Insert data using PDO
+    try {
+        $sql = "INSERT INTO property 
+                (title, pcontent, type, bhk, stype, bedroom, bathroom, balcony, kitchen, hall, floor, size, price, location, city, state, feature, pimage, pimage1, pimage2, pimage3, pimage4, uid, status, mapimage, topmapimage, groundmapimage, totalfloor, isFeatured) 
+                VALUES 
+                (:title, :content, :ptype, :bhk, :stype, :bed, :bath, :balc, :kitc, :hall, :floor, :asize, :price, :loc, :city, :state, :feature, :aimage, :aimage1, :aimage2, :aimage3, :aimage4, :uid, :status, :fimage, :fimage1, :fimage2, :totalfloor, :isFeatured)";
+
+        $stmt = $pdo->prepare($sql);
+
+        $stmt->execute([
+            ':title' => $title,
+            ':content' => $content,
+            ':ptype' => $ptype,
+            ':bhk' => $bhk,
+            ':stype' => $stype,
+            ':bed' => $bed,
+            ':bath' => $bath,
+            ':balc' => $balc,
+            ':kitc' => $kitc,
+            ':hall' => $hall,
+            ':floor' => $floor,
+            ':asize' => $asize,
+            ':price' => $price,
+            ':loc' => $loc,
+            ':city' => $city,
+            ':state' => $state,
+            ':feature' => $feature,
+            ':aimage' => $aimage,
+            ':aimage1' => $aimage1,
+            ':aimage2' => $aimage2,
+            ':aimage3' => $aimage3,
+            ':aimage4' => $aimage4,
+            ':uid' => $uid,
+            ':status' => $status,
+            ':fimage' => $fimage,
+            ':fimage1' => $fimage1,
+            ':fimage2' => $fimage2,
+            ':totalfloor' => $totalfloor,
+            ':isFeatured' => $isFeatured
+        ]);
+
+        $msg = "<p class='alert alert-success'>Property Inserted Successfully</p>";
+    } catch (PDOException $e) {
+        $error = "<p class='alert alert-warning'>Property Not Inserted. Error: " . $e->getMessage() . "</p>";
+    }
 }							
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 

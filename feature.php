@@ -3,10 +3,10 @@ ini_set('session.cache_limiter','public');
 session_cache_limiter(false);
 session_start();
 include("config.php");
-if(!isset($_SESSION['uemail']))
-{
-	header("location:login.php");
-}								
+
+if(!isset($_SESSION['uemail'])) {
+    header("location:login.php");
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,18 +16,13 @@ if(!isset($_SESSION['uemail']))
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-<!-- Meta Tags -->
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <link rel="shortcut icon" href="images/favicon.ico">
 
-<!--	Fonts
-	========================================================-->
+<!-- Fonts -->
 <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,500,600,700&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Comfortaa:400,700" rel="stylesheet">
 
-<!--	Css Link
-	========================================================-->
+<!-- CSS Links -->
 <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="css/bootstrap-slider.css">
 <link rel="stylesheet" type="text/css" href="css/jquery-ui.css">
@@ -39,31 +34,18 @@ if(!isset($_SESSION['uemail']))
 <link rel="stylesheet" type="text/css" href="css/style.css">
 <link rel="stylesheet" type="text/css" href="css/login.css">
 
-<!--	Title
-	=========================================================-->
+<!-- Title -->
 <title>Real Estate PHP</title>
 </head>
 <body>
 
-<!--	Page Loader
-=============================================================
-<div class="page-loader position-fixed z-index-9999 w-100 bg-white vh-100">
-	<div class="d-flex justify-content-center y-middle position-relative">
-	  <div class="spinner-border" role="status">
-		<span class="sr-only">Loading...</span>
-	  </div>
-	</div>
-</div>
---> 
-
-
 <div id="page-wrapper">
     <div class="row"> 
-        <!--	Header start  -->
-		<?php include("include/header.php");?>
-        <!--	Header end  -->
+        <!-- Header start -->
+        <?php include("include/header.php");?>
+        <!-- Header end -->
         
-        <!--	Banner   --->
+        <!-- Banner -->
         <div class="banner-full-row page-banner" style="background-image:url('images/breadcromb.jpg');">
             <div class="container">
                 <div class="row">
@@ -81,87 +63,81 @@ if(!isset($_SESSION['uemail']))
                 </div>
             </div>
         </div>
-         <!--	Banner   --->
-		 
-		 
-		<!--	Submit property   -->
+         <!-- Banner -->
+         
+        <!-- Submit property -->
         <div class="full-row bg-gray">
-            <div class="container"><!-- FOR MORE PROJECTS visit: freeprojectscodes.com -->
+            <div class="container">
                     <div class="row mb-5">
-						<div class="col-lg-12">
-							<h2 class="text-secondary double-down-line text-center">User Listed Property</h2>
-							<?php 
-								if(isset($_GET['msg']))	
-								echo $_GET['msg'];	
-							?>
+                        <div class="col-lg-12">
+                            <h2 class="text-secondary double-down-line text-center">User Listed Property</h2>
+                            <?php 
+                                if(isset($_GET['msg']))	
+                                echo $_GET['msg'];	
+                            ?>
                         </div>
-					</div><!-- FOR MORE PROJECTS visit: freeprojectscodes.com -->
-					<table class="items-list col-lg-12 table-hover" style="border-collapse:inherit;">
+                    </div>
+
+                    <table class="items-list col-lg-12 table-hover" style="border-collapse:inherit;">
                         <thead>
-                             <tr  class="bg-dark">
+                             <tr class="bg-dark">
                                 <th class="text-white font-weight-bolder">Properties</th>
                                 <th class="text-white font-weight-bolder">BHK</th>
                                 <th class="text-white font-weight-bolder">Type</th>
                                 <th class="text-white font-weight-bolder">Added Date</th>
-								<th class="text-white font-weight-bolder">Status</th>
+                                <th class="text-white font-weight-bolder">Status</th>
                                 <th class="text-white font-weight-bolder">Update</th>
-								<th class="text-white font-weight-bolder">Delete</th>
+                                <th class="text-white font-weight-bolder">Delete</th>
                              </tr>
                         </thead>
                         <tbody>
-						<!-- FOR MORE PROJECTS visit: freeprojectscodes.com -->
-							<?php 
-							$uid=$_SESSION['uid'];
-							$query=mysqli_query($con,"SELECT * FROM `property` WHERE uid='$uid'");
-								while($row=mysqli_fetch_array($query))
-								{
-							?>
+                        <?php 
+                        $uid = $_SESSION['uid'];
+                        $stmt = $pdo->prepare("SELECT * FROM `property` WHERE uid = :uid");
+                        $stmt->execute(['uid' => $uid]);
+                        $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                        foreach ($properties as $row) {
+                        ?>
                             <tr>
                                 <td>
-									<img src="admin/property/<?php echo $row['18'];?>" alt="pimage">
+                                    <img src="admin/property/<?php echo $row['pimage'];?>" alt="pimage">
                                     <div class="property-info d-table">
-                                        <h5 class="text-secondary text-capitalize"><a href="propertydetail.php?pid=<?php echo $row['0'];?>"><?php echo $row['1'];?></a></h5>
-                                        <span class="font-14 text-capitalize"><i class="fas fa-map-marker-alt text-success font-13"></i>&nbsp; <?php echo $row['14'];?></span>
+                                        <h5 class="text-secondary text-capitalize"><a href="propertydetail.php?pid=<?php echo $row['pid'];?>"><?php echo $row['title'];?></a></h5>
+                                        <span class="font-14 text-capitalize"><i class="fas fa-map-marker-alt text-success font-13"></i>&nbsp; <?php echo $row['location'];?></span>
                                         <div class="price mt-3">
-											<span class="text-success">$&nbsp;<?php echo $row['13'];?></span>
-										</div>
+                                            <span class="text-success">PKR&nbsp;<?php echo $row['price'];?></span>
+                                        </div>
                                     </div>
-								</td>
-                                <td><?php echo $row['4'];?></td>
-                                <td class="text-capitalize">For <?php echo $row['5'];?></td>
-                                <td><?php echo $row['29'];?></td>
-								<td class="text-capitalize"><?php echo $row['24'];?></td>
-                                <td><a class="btn btn-info" href="submitpropertyupdate.php?id=<?php echo $row['0'];?>">Update</a></td>
-								<td><a class="btn btn-danger" href="submitpropertydelete.php?id=<?php echo $row['0'];?>">Delete</a></td>
+                                </td>
+                                <td><?php echo $row['bhk'];?></td>
+                                <td class="text-capitalize">For <?php echo $row['stype'];?></td>
+                                <td><?php echo $row['date'];?></td>
+                                <td class="text-capitalize"><?php echo $row['status'];?></td>
+                                <td><a class="btn btn-info" href="submitpropertyupdate.php?id=<?php echo $row['pid'];?>">Update</a></td>
+                                <td><a class="btn btn-danger" href="submitpropertydelete.php?id=<?php echo $row['pid'];?>">Delete</a></td>
                             </tr>
-							<?php } ?>
-							<!-- FOR MORE PROJECTS visit: freeprojectscodes.com -->
+                        <?php } ?>
                         </tbody>
                     </table>            
             </div>
         </div>
-	<!--	Submit property   -->
         
-        
-        <!--	Footer   start-->
-		<?php include("include/footer.php");?>
-		<!--	Footer   start-->
+        <!-- Footer start-->
+        <?php include("include/footer.php");?>
+        <!-- Footer end-->
         
         <!-- Scroll to top --> 
         <a href="#" class="bg-secondary text-white hover-text-secondary" id="scroll"><i class="fas fa-angle-up"></i></a> 
         <!-- End Scroll To top --> 
     </div>
-</div><!-- FOR MORE PROJECTS visit: freeprojectscodes.com -->
-<!-- Wrapper End --> 
+</div>
 
-<!--	Js Link
-============================================================--> 
+<!-- JS Links -->
 <script src="js/jquery.min.js"></script> 
-<!--jQuery Layer Slider --> 
 <script src="js/greensock.js"></script> 
 <script src="js/layerslider.transitions.js"></script> 
 <script src="js/layerslider.kreaturamedia.jquery.js"></script> 
-<!--jQuery Layer Slider --> 
 <script src="js/popper.min.js"></script> 
 <script src="js/bootstrap.min.js"></script> 
 <script src="js/owl.carousel.min.js"></script> 
