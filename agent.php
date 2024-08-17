@@ -109,7 +109,11 @@ include("config.php");
                         <div class="hover-zoomer bg-white shadow-one mb-4">
                             <div class="overflow-hidden"> <img src="admin/user/<?php echo $row['uimage'];?>" alt="aimage"> </div>
                             <div class="py-3 text-center">
-                                <h5 class="text-secondary hover-text-success"><a href="#"><?php echo $row['uname'];?></a></h5>
+                            <h5 class="text-secondary hover-text-success">
+    <a href="agentprofile.php?uid=<?php echo $row['uid']; ?>">
+        <?php echo $row['uname'];?>
+    </a>
+</h5>
                                 <span>Real Estate - Agent</span> </div>
                         </div>
                     </div>

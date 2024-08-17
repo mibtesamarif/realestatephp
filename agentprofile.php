@@ -1,3 +1,5 @@
+<?php
+include("query.php");?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,66 +68,57 @@
                 <div class="row">
                     <div class="col-lg-8">
                         <div class="row">
+                        <?php 
+                                try {
+                                    // Check if 'uid' is set in the request
+                                    if (isset($_REQUEST['uid'])) {
+                                        $id = $_REQUEST['uid']; // This is the agent's UID, assumed to be passed in the request
+                                    } else {
+                                        throw new Exception('UID not set in request.');
+                                    }
+                                
+                                    // Assuming PDO connection is established and stored in $pdo
+                                    if (!isset($pdo)) {
+                                        throw new Exception('PDO connection is not initialized.');
+                                    }
+                                
+                                    $sql = "SELECT property.*, user.uname, user.utype, user.uimage 
+                                            FROM property 
+                                            JOIN user ON property.uid = user.uid
+                                            WHERE property.uid = :uid"; // Filter by the agent's UID
+                                    $stmt = $pdo->prepare($sql);
+                                    $stmt->bindParam(':uid', $id, PDO::PARAM_INT); // Bind the UID parameter
+                                    $stmt->execute();
+                                
+                                    // Fetch all results into an array
+                                    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                
+                                    // Use foreach loop to iterate over the results
+                                    foreach ($results as $row) {
+							?>
                             <div class="col-md-6">
                                 <div class="featured-thumb hover-zoomer mb-4">
                                     <div class="overlay-black overflow-hidden position-relative"> 
-                                        <img src="admin/property/zillhms1.jpg" alt="Property Image">
-                                        <div class="sale bg-success text-white">For Rent</div>
-                                        <div class="price text-primary text-capitalize">$500,000 <span class="text-white">120 Sqft</span></div>
+                                        <img src="admin/property/<?php echo $row['pimage'];?>" alt="Property Image">
+                                        <div class="sale bg-success text-white">For <?php echo $row['stype'];?></div>
+                                        <div class="price text-primary text-capitalize">PKR <?php echo $row['price'];?> <span class="text-white"><?php echo $row['size'];?> Sqft</span></div>
                                     </div>
                                     <div class="featured-thumb-data shadow-one">
                                         <div class="p-4">
-                                            <h5 class="text-secondary hover-text-success mb-2 text-capitalize"><a href="#">Zillyhomes</a></h5>
-                                            <span class="location text-capitalize"><i class="fas fa-map-marker-alt text-success"></i> Karachi</span> 
+                                            <h5 class="text-secondary hover-text-success mb-2 text-capitalize"><a href="propertydetail.php?pid=<?php echo $row['pid'];?>"><?php echo $row['title'];?></a></h5>
+                                            <span class="location text-capitalize"><i class="fas fa-map-marker-alt text-success"></i> <?php echo $row['location'];?></span> 
                                         </div>
                                         <div class="px-4 pb-4 d-inline-block w-100">
-                                            <div class="float-left text-capitalize"><i class="fas fa-user text-success mr-1"></i>By Ehtisham</div>
-                                            <div class="float-right"><i class="far fa-calendar-alt text-success mr-1"></i> 10-8-2024</div>
+                                            <div class="float-left text-capitalize"><i class="fas fa-user text-success mr-1"></i>By <?php echo $row['uname'];?></div>
+                                            <div class="float-right"><i class="far fa-calendar-alt text-success mr-1"></i> <?php echo date('d-m-Y', strtotime($row['date']));?></div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Additional Property Listings -->
-
-                            <div class="col-md-6">
-                                <div class="featured-thumb hover-zoomer mb-4">
-                                    <div class="overlay-black overflow-hidden position-relative"> 
-                                        <img src="admin/property/zillhms2.jpg" alt="Property Image">
-                                        <div class="sale bg-success text-white">For Rent</div>
-                                        <div class="price text-primary text-capitalize">PKR 20000 <span class="text-white">500 Sqft</span></div>
-                                    </div>
-                                    <div class="featured-thumb-data shadow-one">
-                                        <div class="p-4">
-                                            <h5 class="text-secondary hover-text-success mb-2 text-capitalize"><a href="#">Zillyhomes 2</a></h5>
-                                            <span class="location text-capitalize"><i class="fas fa-map-marker-alt text-success"></i> Karachi</span> 
-                                        </div>
-                                        <div class="px-4 pb-4 d-inline-block w-100">
-                                            <div class="float-left text-capitalize"><i class="fas fa-user text-success mr-1"></i>By Ehtisham</div>
-                                            <div class="float-right"><i class="far fa-calendar-alt text-success mr-1"></i> 1-8-2024</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="featured-thumb hover-zoomer mb-4">
-                                    <div class="overlay-black overflow-hidden position-relative"> 
-                                        <img src="admin/property/zillhms3.jpg" alt="Property Image">
-                                        <div class="sale bg-success text-white">For Rent</div>
-                                        <div class="price text-primary text-capitalize">PKR 20000 <span class="text-white">500 Sqft</span></div>
-                                    </div>
-                                    <div class="featured-thumb-data shadow-one">
-                                        <div class="p-4">
-                                            <h5 class="text-secondary hover-text-success mb-2 text-capitalize"><a href="#">Zillyhomes 3</a></h5>
-                                            <span class="location text-capitalize"><i class="fas fa-map-marker-alt text-success"></i> Karachi</span> 
-                                        </div>
-                                        <div class="px-4 pb-4 d-inline-block w-100">
-                                            <div class="float-left text-capitalize"><i class="fas fa-user text-success mr-1"></i>By Ehtisham</div>
-                                            <div class="float-right"><i class="far fa-calendar-alt text-success mr-1"></i> 1-8-2024</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <?php  }
+} catch (Exception $e) {
+    echo "<p class='alert alert-danger'>Error: " . $e->getMessage() . "</p>";
+} ?>
                         </div>
                     </div>
 
@@ -135,19 +128,55 @@
                         <!-- Agent Details Section -->
                         <div class="sidebar-widget">
                             <h4 class="double-down-line-left text-secondary position-relative pb-4 my-4">Agent Details</h4>
+                            <?php 
+                                
+                             try {
+                                if (isset($_REQUEST['uid'])) {
+                                    $id = $_REQUEST['uid']; // This is the agent's UID, assumed to be passed in the request
+                                } else {
+                                    throw new Exception('UID not set in request.');
+                                }
+                                        $sql = "SELECT * FROM `user` WHERE uid = :uid";
+                                        $stmt = $pdo->prepare($sql);
+                                        $stmt->bindParam(':uid', $id, PDO::PARAM_INT);
+                                        $stmt->execute();
+                                    
+                                        // Fetch all results into an array
+                                        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                    
+                                        // Use foreach to iterate over the results
+                                        foreach ($results as $row) {
+								?>
                             <div class="agent-info">
-                                <img src="images/agent.jpg" alt="Agent Image" class="img-fluid mb-3">
-                                <h5 class="text-secondary">John Doe</h5>
-                                <p><strong>Bio:</strong> John Doe is a licensed real estate agent with over 10 years of experience in helping clients find their dream homes. He specializes in residential properties and is known for his excellent customer service and negotiation skills.</p>
-                                <p><strong>Contact Information:</strong></p>
+                                <img src="admin/user/<?php echo $row['uimage'];?>" alt="Agent Image" class="img-fluid mb-3">
+                                <h5 class="text-secondary"><?php echo $row['uname'];?></h5>
+                                <?php
+                                $id = $row['uid'];
+                                 $sql = "SELECT * FROM `bio` WHERE uid = :uid";
+                                 $stmt = $pdo->prepare($sql);
+                                 $stmt->bindParam(':uid', $id, PDO::PARAM_INT);
+                                 $stmt->execute();
+
+                                 
+                                        // Fetch all results into an array
+                                        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                    
+                                        // Use foreach to iterate over the results
+                                        foreach ($results as $row1) {
+                                ?>
+                                <p><strong>Bio:</strong> <?php echo $row1['agent_bio'];?></strong></p>
+
+                                <?php
+                                        }
+                                ?>
                                 <ul class="list-unstyled">
-                                    <li><i class="fas fa-envelope text-success mr-2"></i> john.doe@example.com</li>
-                                    <li><i class="fas fa-phone-alt text-success mr-2"></i> +123-456-7890</li>
+                                    <li><i class="fas fa-envelope text-success mr-2"></i> <?php echo $row['uemail'];?></li>
+                                    <li><i class="fas fa-phone-alt text-success mr-2"></i> <?php echo $row['uphone'];?></li>
                                     <li><i class="fas fa-map-marker-alt text-success mr-2"></i> 123 Real Estate St, City, Country</li>
                                 </ul>
-                                <p><strong>License Number:</strong> XYZ-12345</p>
+
                                 
-                                <!-- Rating Section -->
+                                <!-- Rating Section
                                 <p><strong>Rating:</strong></p>
                                 <div class="rating mb-3">
                                     <i class="fas fa-star text-warning"></i>
@@ -156,7 +185,11 @@
                                     <i class="fas fa-star text-warning"></i>
                                     <i class="fas fa-star-half-alt text-warning"></i>
                                     <span class="ml-2">(4.5/5 based on 120 reviews)</span>
-                                </div>
+                                </div> -->
+                                <?php }
+                                            } catch (PDOException $e) {
+                                            echo "Error: " . $e->getMessage();
+                                            } ?>
                             </div>
                         </div>
                     </div>
