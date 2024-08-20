@@ -1,58 +1,5 @@
 <?php 
-include("config.php");
-$error="";
-$msg="";
-if(isset($_REQUEST['reg'])) {
-    $name = $_REQUEST['name'];
-    $email = $_REQUEST['email'];
-    $phone = $_REQUEST['phone'];
-    $pass = $_REQUEST['pass'];
-    $utype = $_REQUEST['utype'];
-    $uimage = $_FILES['uimage']['name'];
-    $temp_name1 = $_FILES['uimage']['tmp_name'];
-
-    // Hash the password using password_hash()
-    $hashed_pass =  password_hash($pass, PASSWORD_DEFAULT);
-
-
-    try {
-
-        // Check if email already exists
-        $query = "SELECT * FROM user WHERE uemail = :email";
-        $stmt = $pdo->prepare($query);
-        $stmt->execute(['email' => $email]);
-        $num = $stmt->rowCount();
-
-        if($num == 1) {
-            $error = "<p class='alert alert-warning'>Email Id already exists</p>";
-        } else {
-            if(!empty($name) && !empty($email) && !empty($phone) && !empty($pass) && !empty($uimage)) {
-                $sql = "INSERT INTO user (uname, uemail, uphone, upass, utype, uimage) VALUES (:name, :email, :phone, :pass, :utype, :uimage)";
-                $stmt = $pdo->prepare($sql);
-                $result = $stmt->execute([
-                    'name' => $name,
-                    'email' => $email,
-                    'phone' => $phone,
-                    'pass' => $hashed_pass,
-                    'utype' => $utype,
-                    'uimage' => $uimage
-                ]);
-
-                if($result) {
-                    move_uploaded_file($temp_name1, "admin/user/$uimage");
-                    $msg = "<p class='alert alert-success'>Registered Successfully</p>";
-                    echo "<script> location.assign('login.php');</script>";
-                } else {
-                    $error = "<p class='alert alert-warning'>Registration Not Successful</p>";
-                }
-            } else {
-                $error = "<p class='alert alert-warning'>Please Fill all the fields</p>";
-            }
-        }
-    } catch (PDOException $e) {
-        $error = "<p class='alert alert-danger'>Error: " . $e->getMessage() . "</p>";
-    }
-}
+include("query.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">

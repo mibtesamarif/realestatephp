@@ -1,44 +1,6 @@
 <?php 
-ini_set('session.cache_limiter','public');
-session_cache_limiter(false);
-session_start();
-$error="";
-$msg="";
-include("config.php");
-if (isset($_REQUEST['reg'])) {
-    $name = $_REQUEST['name'];
-    $email = $_REQUEST['email'];
-    $phone = $_REQUEST['phone'];
-    $pass = $_REQUEST['pass'];
-    $uimage = $_FILES['uimage']['name'];
-    $temp_name1 = $_FILES['uimage']['tmp_name'];
+include("query.php");
 
-    // Hash the password using password_hash()
-    $hashed_pass = password_hash($pass, PASSWORD_DEFAULT);
-
-    try {
-        // Update the user details
-        $sql = "UPDATE user SET uname = :name, uphone = :phone, upass = :pass, uimage = :uimage WHERE uemail = :email";
-        $stmt = $pdo->prepare($sql);
-        $result = $stmt->execute([
-            'name' => $name,
-            'phone' => $phone,
-            'pass' => $hashed_pass,
-            'uimage' => $uimage,
-            'email' => $email
-        ]);
-
-        if ($result) {
-            move_uploaded_file($temp_name1, "admin/user/$uimage");
-            $msg = "<p class='alert alert-success'>Updated Successfully</p>";
-        } else {
-            $error = "<p class='alert alert-warning'>Update Not Successful</p>";
-            echo "<script> location.assign('login.php');</script>";
-        }
-    } catch (PDOException $e) {
-        $error = "<p class='alert alert-danger'>Error: " . $e->getMessage() . "</p>";
-    }
-}					
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -128,6 +90,10 @@ if (isset($_REQUEST['reg'])) {
 		 
 		 
 		<!--	Submit property   -->
+            <?php
+            $uid = $_SESSION['uid'];
+            echo"$uid";
+            ?>
         <div class="full-row">
             <div class="container">
                     <div class="row">
@@ -167,6 +133,10 @@ if (isset($_REQUEST['reg'])) {
                                 <div class="form-group">
                                     <input type="text"  name="phone" value="<?php echo $row['uphone'];?>" class="form-control" placeholder="Your Phone*" minlength="11" maxlength="11">
 								</div>
+                                <div class="form-group">
+                                    <textarea id="bio" name="bio" class="form-control" placeholder="Your Bio (max 250 characters)" maxlength="250" rows="4"></textarea>
+                                    <small id="charCount" class="form-text text-muted">250 characters remaining</small>
+                                </div>
 
                                 <div class="form-group">
                                     <input type="password" name="pass" id="password"  class="form-control" placeholder="Your Password*">
@@ -186,7 +156,7 @@ if (isset($_REQUEST['reg'])) {
                                     <input class="form-control" name="uimage" type="file">
                                 </div>
 
-                                <button class="btn btn-success" name="update" value="Register" type="submit">Save</button>
+                                <button class="btn btn-success" name="update" value="update" type="submit">Save</button>
                             </div>
 							</form>
                             <div class="col-lg-1"></div>
@@ -198,7 +168,9 @@ if (isset($_REQUEST['reg'])) {
                                     </div>
 									
                                     <div class="font-18">
-                                        <div class="mb-1 text-capitalize"><b>Name:</b> <?php echo $row['uname'];?></div>
+                                        <div class="mb-1 text-capitalize"><b style="color:black;"> <?php echo $row['uname'];?></b></div>
+                                        <div class="mb-1 mt-1"><b>Bio:</b> <?php echo $row['uemail'];?></div>
+                                        <div class="mb-1 mt-1"><b style="color:black;">Contact Information</b> </div>
                                         <div class="mb-1"><b>Email:</b> <?php echo $row['uemail'];?></div>
                                         <div class="mb-1"><b>Contact:</b> <?php echo $row['uphone'];?></div>
 										<div class="mb-1 text-capitalize"><b>Role:</b> <?php echo $row['utype'];?></div>
@@ -305,6 +277,21 @@ if (isset($_REQUEST['reg'])) {
             } else {
                 upper.classList.remove('valid');
                 upper.classList.add('invalid');
+            }
+        });
+    </script>
+    <script>
+        const bio = document.getElementById('bio');
+        const charCount = document.getElementById('charCount');
+        const maxChars = 250;
+
+        bio.addEventListener('input', function() {
+            const remaining = maxChars - bio.value.length;
+            charCount.textContent = `${remaining} characters remaining`;
+
+            // If the limit is reached, prevent further typing
+            if (remaining <= 0) {
+                charCount.textContent = 'You have reached the 250 character limit';
             }
         });
     </script>

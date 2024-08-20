@@ -109,14 +109,15 @@ include("config.php");
                                 <div class="col-md-6">
                                     <div class="featured-thumb hover-zoomer mb-4">
                                         <div class="overlay-black overflow-hidden position-relative">
-                                            <img src="admin/property/<?php echo $row['18']; ?>" alt="pimage">
-                                            <div class="sale bg-success text-white">For <?php echo $row['5']; ?></div>
-                                            <div class="price text-primary text-capitalize">$<?php echo $row['13']; ?> <span class="text-white"><?php echo $row['12']; ?> Sqft</span></div>
+                                            <img src="admin/property/<?php echo $row['pimage']; ?>" alt="pimage">
+                                            <div class="sale bg-success text-white">For <?php echo $row['stype']; ?></div>
+                                            <div class="price text-primary text-capitalize">PKR<?php echo $row['price']; ?>
+                                             <span class="text-white"><?php echo $row['size']; ?> Sqft</span></div>
                                         </div>
                                         <div class="featured-thumb-data shadow-one">
                                             <div class="p-4">
-                                                <h5 class="text-secondary hover-text-success mb-2 text-capitalize"><a href="propertydetail.php?pid=<?php echo $row['0']; ?>"><?php echo $row['1']; ?></a></h5>
-                                                <span class="location text-capitalize"><i class="fas fa-map-marker-alt text-success"></i> <?php echo $row['14']; ?></span>
+                                                <h5 class="text-secondary hover-text-success mb-2 text-capitalize"><a href="propertydetail.php?pid=<?php echo $row['pid']; ?>"><?php echo $row['title']; ?></a></h5>
+                                                <span class="location text-capitalize"><i class="fas fa-map-marker-alt text-success"></i> <?php echo $row['location']; ?></span>
                                             </div>
                                             <div class="px-4 pb-4 d-inline-block w-100">
                                                 <div class="float-left text-capitalize"><i class="fas fa-user text-success mr-1"></i>By : <?php echo $row['uname']; ?></div>
@@ -174,9 +175,9 @@ include("config.php");
                         foreach ($recentProperties as $row) {
                         ?>
                             <li>
-                                <img src="admin/property/<?php echo $row['18']; ?>" alt="pimage">
-                                <h6 class="text-secondary hover-text-success text-capitalize"><a href="propertydetail.php?pid=<?php echo $row['0']; ?>"><?php echo $row['1']; ?></a></h6>
-                                <span class="font-14"><i class="fas fa-map-marker-alt icon-success icon-small"></i> <?php echo $row['14']; ?></span>
+                                <img src="admin/property/<?php echo $row['pimage']; ?>" alt="pimage">
+                                <h6 class="text-secondary hover-text-success text-capitalize"><a href="propertydetail.php?pid=<?php echo $row['pid']; ?>"><?php echo $row['title']; ?></a></h6>
+                                <span class="font-14"><i class="fas fa-map-marker-alt icon-success icon-small"></i> <?php echo $row['location']; ?></span>
                             </li>
                         <?php
                         }

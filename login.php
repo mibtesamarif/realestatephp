@@ -1,55 +1,11 @@
 <?php 
-session_start();
-include("config.php");
-$error="";
-$msg="";
-if (isset($_REQUEST['login'])) {
-    $email = $_REQUEST['email'];
-    $pass = $_REQUEST['pass'];
 
-    if (!empty($email) && !empty($pass)) {
-        try {
-            // Prepare the SQL query to select user with the given email
-            $sql = "SELECT * FROM user WHERE uemail = :email";
-            $stmt = $pdo->prepare($sql);
-            $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-            $stmt->execute();
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if ($row) {
-                // Verify the hashed password
-                if (password_verify($pass, $row['upass'])) {
-    
+include("query.php");
 
-                    // Password is correct, set session variables
-                    $_SESSION['uid'] = $row['uid'];
-                    $_SESSION['utype'] = $row['utype'];
-                    $_SESSION['uemail'] = $row['uemail'];
-                    
-                    // Redirect to index.php
-                    header("Location: index.php");
-                    exit(); // Ensure no further code is executed
-                } else {
-                    // Debugging: Log incorrect password attempt
-                    echo "Password verification failed.<br>";
-                    echo "Entered Password: " . htmlspecialchars($pass) . "<br>";
-                    $error = "<p class='alert alert-warning'>Email or Password does not match!</p>";
-                }
-            } else {
-                $error = "<p class='alert alert-warning'>Email or Password does not match!</p>";
-            }
-        } catch (PDOException $e) {
-            $error = "<p class='alert alert-danger'>Error: " . $e->getMessage() . "</p>";
-        }
-    } else {
-        $error = "<p class='alert alert-warning'>Please fill all the fields</p>";
-    }
-}
-
-// Display any error messages
-if (isset($error)) {
-    echo $error;
-}
+// // Display any error messages
+// if (isset($error)) {
+//     echo $error;
+// }
 
 ?>
 <!DOCTYPE html>
