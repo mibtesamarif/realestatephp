@@ -67,7 +67,7 @@ include("config.php");
                             <h1 class="mb-4"><span class="text-success">Let us</span><br>
                             Guide you Home</h1><!-- FOR MORE PROJECTS visit: freeprojectscodes.com -->
                             <form method="post" action="propertygrid.php">
-                                <div class="row">
+                                <div class="row justify-content-center">
                                     <div class="col-md-6 col-lg-2">
                                         <div class="form-group">
                                             <select class="form-control" name="type">
@@ -90,11 +90,53 @@ include("config.php");
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-8 col-lg-6">
+                                    <div class="col-md-12 col-lg-6">
                                         <div class="form-group">
                                             <input type="text" class="form-control" name="city" placeholder="Enter City" required>
                                         </div>
                                     </div>
+                                    <!-- <div class="col-md-6 col-lg-3">
+                                        <div class="form-group">
+                                        <select class="form-control" name="state" id="stateSelect">
+                                            <option value="">Select State</option>
+                                            <?php 
+                                                // $sql = "SELECT * FROM state";
+                                                // $stmt = $pdo->prepare($sql);
+                                                // $stmt->execute();
+                                                // $states = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                                                // foreach ($states as $state) {
+                                            ?>
+                                            <option value="<?php //echo $state['sid']; ?>"><?php //echo $state['sname']; ?></option>
+                                            <?php //} ?>
+                                        </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-3">
+                                        <div class="form-group">
+                                        <select class="form-control" name="city" id="citySelect">
+                                            <option value="">Select City</option>
+                                            <?php
+                                                //if (isset($_POST['stateId'])) {
+                                                 //   $stateId = $_POST['stateId'];
+                                                 //   var_dump($stateId); // This will output the stateId received from the AJAX request
+
+                                                    // Fetch cities based on the selected state
+                                                    // $sql = "SELECT * FROM city WHERE sid = :stateId";
+                                                    // $stmt = $pdo->prepare($sql);
+                                                    // $stmt->execute(['stateId' => $stateId]);
+                                                    // $cities = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                                                    // // Generate the city options
+                                                    // foreach ($cities as $city) {
+                                                    //     echo '<option value="' . $city['id'] . '">' . $city['name'] . '</option>';
+                                                    // }
+                                                    // exit; // Exit to prevent the rest of the page from loading
+                                               // }
+                                                ?>
+                                        </select>
+                                        </div>
+                                    </div> -->
                                     <div class="col-md-4 col-lg-2">
                                         <div class="form-group">
                                             <button type="submit" name="filter" class="btn btn-success w-100">Search Property</button>
@@ -527,6 +569,31 @@ foreach ($results as $row) {
 <script src="js/validate.js"></script> 
 <script src="js/jquery.cookie.js"></script> 
 <script src="js/custom.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#stateSelect').change(function() {
+        var stateId = $(this).val();
+
+        // Clear the city dropdown
+        $('#citySelect').html('<option value="">Select City</option>');
+
+        if (stateId != '') {
+            $.ajax({
+                url: '', // Same page
+                method: 'POST',
+                data: {stateId: stateId},
+                success: function(response) {
+                    $('#citySelect').html(response); // Populate city dropdown
+                },
+                error: function(xhr, status, error) {
+                    console.log("AJAX Error:", error); // Debug any errors
+                }
+            });
+        }
+    });
+});
+</script>
 </body>
 
 </html>
