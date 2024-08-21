@@ -104,7 +104,6 @@ include("query.php");
                 <div class="dashboard-personal-info p-5 bg-white">
                     <form action="#" method="post">
                         <h5 class="text-secondary border-bottom-on-white pb-3 mb-4">User Information</h5>
-						<?php echo $msg; ?><?php echo $error; ?>
                         <?php 
 									$uid = $_SESSION['uid'];
 
@@ -133,10 +132,17 @@ include("query.php");
                                 <div class="form-group">
                                     <input type="text"  name="phone" value="<?php echo $row['uphone'];?>" class="form-control" placeholder="Your Phone*" minlength="11" maxlength="11">
 								</div>
+                                <?php
+                                    if($row['utype'] == "agent"){
+                                        ?>
                                 <div class="form-group">
                                     <textarea id="bio" name="bio" class="form-control" placeholder="Your Bio (max 250 characters)" maxlength="250" rows="4"></textarea>
                                     <small id="charCount" class="form-text text-muted">250 characters remaining</small>
                                 </div>
+                                        <?php
+                                    }
+                                ?>
+                                
 
                                 <div class="form-group">
                                     <input type="password" name="pass" id="password"  class="form-control" placeholder="Your Password*">
@@ -169,7 +175,13 @@ include("query.php");
 									
                                     <div class="font-18">
                                         <div class="mb-1 text-capitalize"><b style="color:black;"> <?php echo $row['uname'];?></b></div>
+                                        <?php
+                                    if($row['utype'] == "agent"){
+                                        ?>
                                         <div class="mb-1 mt-1"><b>Bio:</b> <?php echo $row['uemail'];?></div>
+                                        <?php
+                                    }
+                                ?>
                                         <div class="mb-1 mt-1"><b style="color:black;">Contact Information</b> </div>
                                         <div class="mb-1"><b>Email:</b> <?php echo $row['uemail'];?></div>
                                         <div class="mb-1"><b>Contact:</b> <?php echo $row['uphone'];?></div>

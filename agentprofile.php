@@ -172,7 +172,6 @@ include("query.php");?>
                                 <ul class="list-unstyled">
                                     <li><i class="fas fa-envelope text-success mr-2"></i> <?php echo $row['uemail'];?></li>
                                     <li><i class="fas fa-phone-alt text-success mr-2"></i> <?php echo $row['uphone'];?></li>
-                                    <li><i class="fas fa-map-marker-alt text-success mr-2"></i> 123 Real Estate St, City, Country</li>
                                 </ul>
 
                                 

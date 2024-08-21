@@ -44,7 +44,7 @@ if(isset($_REQUEST['reg'])) {
                 if($result) {
                     move_uploaded_file($temp_name1, "admin/user/$uimage");
                     $msg = "<p class='alert alert-success'>Registered Successfully</p>";
-                    echo "<script>location.assign'login.php';</script>";
+                    header("Location: login.php");
                 } else {
                     $error = "<p class='alert alert-warning'>Registration Not Successful</p>";
                 }
@@ -103,81 +103,157 @@ if (isset($_REQUEST['login'])) {
 }
 
                     // ----- Profile -----
-$error = "";
-$msg = "";
+// $error = "";
+// $msg = "";
 
-if (isset($_REQUEST['update'])) {
-    $name = $_REQUEST['name'];
-    $email = $_REQUEST['email'];
-    $phone = $_REQUEST['phone'];
-    $pass = $_REQUEST['pass'];
-    $uid = $_SESSION['uid'];
-    $uimage = null;
-    $temp_name1 = null;
+// if (isset($_REQUEST['update'])) {
+//     $name = $_REQUEST['name'];
+//     $email = $_REQUEST['email'];
+//     $phone = $_REQUEST['phone'];
+//     $pass = $_REQUEST['pass'];
+//     $uid = $_SESSION['uid'];
+//     $uimage = null;
+//     $temp_name1 = null;
 
-    if (isset($_FILES['uimage']) && !empty($_FILES['uimage']['name'])) {
-        $uimage = $_FILES['uimage']['name'];
-        $temp_name1 = $_FILES['uimage']['tmp_name'];
+//     if (isset($_FILES['uimage']) && !empty($_FILES['uimage']['name'])) {
+//         $uimage = $_FILES['uimage']['name'];
+//         $temp_name1 = $_FILES['uimage']['tmp_name'];
 
-        // Generate a unique file name to avoid overwriting existing files
-        $uimage = time() . '_' . basename($uimage);
-        error_log("Image to upload: " . $uimage);
-    } else {
-        error_log("No image uploaded.");
+//         // Generate a unique file name to avoid overwriting existing files
+//         $uimage = time() . '_' . basename($uimage);
+//         error_log("Image to upload: " . $uimage);
+//     } else {
+//         error_log("No image uploaded.");
+//     }
+
+//     try {
+//         // Construct SQL query
+//         $sql = "UPDATE user SET uname = :name, uemail = :email, uphone = :phone";
+        
+//         if (!empty($pass)) {
+//             $hashed_pass = password_hash($pass, PASSWORD_DEFAULT);
+//             $sql .= ", upass = :pass";
+//         }
+
+//         if (!empty($uimage)) {
+//             $sql .= ", uimage = :uimage";
+//         }
+
+//         $sql .= " WHERE uid = :uid";
+//         error_log("SQL Query: " . $sql);
+
+//         $stmt = $pdo->prepare($sql);
+
+//         // Bind parameters
+//         $stmt->bindParam(':name', $name);
+//         $stmt->bindParam(':email', $email);
+//         $stmt->bindParam(':phone', $phone);
+
+//         if (!empty($pass)) {
+//             $stmt->bindParam(':pass', $hashed_pass);
+//         }
+
+//         if (!empty($uimage)) {
+//             $stmt->bindParam(':uimage', $uimage);
+//         }
+
+//         $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
+
+//         // Execute the query
+//         if ($stmt->execute()) {
+//             error_log("Query executed successfully.");
+//             if (!empty($uimage) && move_uploaded_file($temp_name1, "admin/user/$uimage")) {
+//                 $msg = "<p class='alert alert-success'>Updated Successfully</p>";
+//             } elseif (empty($uimage)) {
+//                 $msg = "<p class='alert alert-success'>Updated Successfully</p>";
+//             } else {
+//                 $error = "<p class='alert alert-warning'>Image upload failed</p>";
+//                 error_log("Failed to move uploaded image.");
+//             }
+//         } else {
+//             $error = "<p class='alert alert-warning'>Update Not Successful</p>";
+//             $errorInfo = $stmt->errorInfo();
+//             error_log("Error executing query: " . print_r($errorInfo, true));
+//         }
+//     } catch (PDOException $e) {
+//         error_log("PDOException: " . $e->getMessage());
+//         $error = "<p class='alert alert-danger'>Error: " . $e->getMessage() . "</p>";
+//     }
+// }
+
+// update user information
+if(isset($_POST['update'])){
+    $userId = $_SESSION['uid'];
+    $userName = $_POST['name'];
+    $userEmail = $_POST['email'];
+    $phoneNumber = $_POST['phone'];
+    $userbio = $_POST['bio'];
+
+    $updateUserQuery = $pdo->prepare("UPDATE user SET uname = :name, uemail = :email, uphone = :phoneNumber WHERE uid = :userId");
+    $updateUserQuery->bindParam(':name',  $userName);
+    $updateUserQuery->bindParam(':email',  $userEmail);
+    $updateUserQuery->bindParam(':phoneNumber', $phoneNumber);
+    $updateUserQuery->bindParam(':userId', $userId);
+
+    if($updateUserQuery->execute()){
+        $userPassword = $_POST['pass'];
+        if (!empty($userPassword)){
+            $hashed_pass =  password_hash($userPassword, PASSWORD_DEFAULT);
+            $updateUserPassQuery = $pdo->prepare("UPDATE user SET upass = :pass WHERE uid = :userId");
+            $updateUserPassQuery->bindParam(':pass',  $hashed_pass);
+            $updateUserPassQuery->bindParam(':userId', $userId);
+            $updateUserPassQuery->execute();
+        }
     }
 
-    try {
-        // Construct SQL query
-        $sql = "UPDATE user SET uname = :name, uemail = :email, uphone = :phone";
+        if (!empty($userbio)){
+            $sql = "SELECT agent_bio FROM `bio` WHERE uid = :uid";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':uid', $userId, PDO::PARAM_INT);
+            $stmt->execute();
         
-        if (!empty($pass)) {
-            $hashed_pass = password_hash($pass, PASSWORD_DEFAULT);
-            $sql .= ", upass = :pass";
-        }
+            // Fetch all results into an array
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if (!empty($uimage)) {
-            $sql .= ", uimage = :uimage";
-        }
-
-        $sql .= " WHERE uid = :uid";
-        error_log("SQL Query: " . $sql);
-
-        $stmt = $pdo->prepare($sql);
-
-        // Bind parameters
-        $stmt->bindParam(':name', $name);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':phone', $phone);
-
-        if (!empty($pass)) {
-            $stmt->bindParam(':pass', $hashed_pass);
-        }
-
-        if (!empty($uimage)) {
-            $stmt->bindParam(':uimage', $uimage);
-        }
-
-        $stmt->bindParam(':uid', $uid, PDO::PARAM_INT);
-
-        // Execute the query
-        if ($stmt->execute()) {
-            error_log("Query executed successfully.");
-            if (!empty($uimage) && move_uploaded_file($temp_name1, "admin/user/$uimage")) {
-                $msg = "<p class='alert alert-success'>Updated Successfully</p>";
-            } elseif (empty($uimage)) {
-                $msg = "<p class='alert alert-success'>Updated Successfully</p>";
-            } else {
-                $error = "<p class='alert alert-warning'>Image upload failed</p>";
-                error_log("Failed to move uploaded image.");
+            if(!empty($results['agent_bio'])){
+                $updateUserPassQuery = $pdo->prepare("UPDATE bio SET agent_bio = :agent_bio WHERE uid = :userId");
+                $updateUserPassQuery->bindParam(':agent_bio',  $hashed_pass);
+                $updateUserPassQuery->bindParam(':userId', $userId);
+                $updateUserPassQuery->execute();
             }
-        } else {
-            $error = "<p class='alert alert-warning'>Update Not Successful</p>";
-            $errorInfo = $stmt->errorInfo();
-            error_log("Error executing query: " . print_r($errorInfo, true));
+            else{
+                $insertUserPassQuery = $pdo->prepare("INSERT INTO bio (agent_bio, uid) VALUES (:agent_bio, :userId)");
+                $insertUserPassQuery->bindParam(':agent_bio',  $userbio);
+                $insertUserPassQuery->bindParam(':userId', $userId);
+                $insertUserPassQuery->execute();
+            }
         }
-    } catch (PDOException $e) {
-        error_log("PDOException: " . $e->getMessage());
-        $error = "<p class='alert alert-danger'>Error: " . $e->getMessage() . "</p>";
+    
+
+    if(isset($_FILES['uimage']) && $_FILES['uimage']['error'] === UPLOAD_ERR_OK){
+        $categoryImageName = $_FILES['uimage']['name'];
+        $categoryImageTmpName = $_FILES['uimage']['tmp_name'];
+        $destination = "admin/user/" . $categoryImageName;
+        
+        // Move the uploaded file to the destination folder
+        if(move_uploaded_file($categoryImageTmpName, $destination)){
+            // Prepare and execute the SQL query to update the category in the database
+            $query = $pdo->prepare("UPDATE user SET uimage = :categoryImageName WHERE uid = :id");
+            $query->bindParam(':categoryImageName', $categoryImageName);
+            $query->bindParam(':id', $userId);
+            if($query->execute()){
+                echo "<script>alert('inserted');</script>"; 
+            }
+            else{
+                echo "<script>alert('not inserted');</script>";
+            }
+            
+        
+        } else {
+            echo "<script>alert('Failed to move uploaded file');</script>";
+        }
     }
 }
+
+
 ?>

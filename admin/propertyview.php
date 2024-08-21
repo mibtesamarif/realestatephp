@@ -7,6 +7,51 @@ if(!isset($_SESSION['auser']))
 {
 	header("location:index.php");
 }
+$error="";
+// not verify 
+if (isset($_GET['p_a_id'])) {
+    $pid = $_GET['p_a_id'];
+
+    try {
+        // Update the blog status and post date
+        $query = $pdo->prepare("UPDATE property SET aproval = :aproval WHERE pid = :pid");
+        $query->bindParam(':pid', $pid);
+        $query->bindParam(':aproval', $aproval);
+        $aproval = 'not_verify';
+
+        if ($query->execute()) {
+            //echo "<script>alert('Property Has been Unverify.')";
+			//$error = "<p class='alert alert-warning'>Property Has been Unverify.</p>";
+        } else {
+            //echo "<script>alert('Failed to Unverify property.')</script>";
+			//$error = "<p class='alert alert-warning'>Failed to Unverify property.</p>";
+        }
+    } catch (PDOException $e) {
+        echo "<script>alert('Failed to Unverify property: " . $e->getMessage() . "')</script>";
+    }
+}
+//verify 
+if (isset($_GET['p_n_id'])) {
+    $pid = $_GET['p_n_id'];
+
+    try {
+        // Update the blog status and post date
+        $query = $pdo->prepare("UPDATE property SET aproval = :aproval WHERE pid = :pid");
+        $query->bindParam(':pid', $pid);
+        $query->bindParam(':aproval', $aproval);
+        $aproval = 'verify';
+
+        if ($query->execute()) {
+           // echo "<script>alert('Property Has been verify.')";
+			//$error = "<p class='alert alert-warning'>Property Has been verify.</p>";
+        } else {
+            //echo "<script>alert('Failed to verify property.')</script>";
+			//$error = "<p class='alert alert-warning'>Failed to verify property.</p>";
+        }
+    } catch (PDOException $e) {
+        echo "<script>alert('Failed to verify property: " . $e->getMessage() . "')</script>";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -132,6 +177,13 @@ if(!isset($_SESSION['auser']))
 															<a href="propertydelete.php?id=<?php echo $row[0]; ?>">
 																<button class="btn btn-danger">Delete</button>
 															</a>
+															<?php
+															echo $row[31] === 'verify' 
+																? '<a href="?p_a_id=' . $row[0] . '"><button class="btn btn-danger">Unverify</button></a>'
+																: ($row[31] === 'not_verify' 
+																	? '<a href="?p_n_id=' . $row[0] . '"><button class="btn btn-danger">Verify</button></a>'
+																	: '');
+															?>
 															
 														</td>
 													</tr>
